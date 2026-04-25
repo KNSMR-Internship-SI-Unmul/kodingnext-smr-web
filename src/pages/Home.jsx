@@ -1,36 +1,49 @@
 import heroImg from "../assets/images/hero-image.png";
 import logoImg from "../assets/images/logo-knsmr.png";
 
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { courses } from "../assets/data/courseTypes";
+import { courseTypes } from "../assets/data/courseTypes";
 import { promotions } from "../assets/data/promotions";
 import { events } from "../assets/data/events";
 import { reviews } from "../assets/data/reviews";
+import { modules } from "../assets/data/modules";
 
 export default function Home() {
   const promoRef = useRef(null);
   const eventRef = useRef(null);
+  const scrollRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    const observerOptions = {
-      threshold: 0.15,
-    };
+  const getAgeRangeForCourseType = (courseTypeName) => {
+    const matchingModules = modules.filter(m => m.course_type === courseTypeName);
+    if (matchingModules.length === 0) return "";
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("active");
-        }
-      });
-    }, observerOptions);
+    const ages = matchingModules.map(m => m.age_range);
 
-    const elements = document.querySelectorAll('[class*="reveal"]');
-    elements.forEach((el) => observer.observe(el));
+    const uniqueAges = [...new Set(ages)];
+    return uniqueAges.join(", "); 
+  };
 
-    return () => observer.disconnect();
-  }, []);
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      const totalScroll = scrollWidth - clientWidth;
+      const progress = (scrollLeft / totalScroll) * 100;
+      setScrollProgress(progress);
+    }
+  };
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { clientWidth } = scrollRef.current;
+      const scrollAmount = direction === "left" 
+      ? -(clientWidth / 3) 
+      : (clientWidth / 3);
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   const scrollPromo = (direction) => {
     promoRef.current.scrollBy({
@@ -46,9 +59,39 @@ export default function Home() {
     });
   };
 
+  useEffect(() => {
+    document.title = "Beranda | Koding Next Samarinda";
+    window.scrollTo(0, 0);
+
+    const observerOptions = {threshold: 0.15,};
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+        }
+      });
+    }, observerOptions);
+
+    const elements = document.querySelectorAll('[class*="reveal"]');
+    elements.forEach((el) => observer.observe(el));
+
+    const currentRef = scrollRef.current;
+        if (currentRef) {
+          currentRef.addEventListener("scroll", handleScroll);
+        }
+
+        return () => {
+              observer.disconnect();
+              if (currentRef) {
+                currentRef.removeEventListener("scroll", handleScroll);
+              }
+            };
+          }, []);
+
   return (
     <div>
-      <section className="container mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-transparent via-50% via-secondary-pink to-secondary-blue items-center justify-center gap-6 overflow-hidden">
+      <section className="container mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center gap-6 overflow-hidden">
         <div className="lg:w-1/2 text-center lg:text-left reveal lg:pl-20">
           <h1 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-gray-900 text-shadow-xs">
             Koding Next <br />
@@ -119,10 +162,10 @@ export default function Home() {
           </div>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:px-24"> 
-            {courses.map((course, index) => (
+            {courseTypes.map((course, index) => (
               <Link 
-                to={course.link} 
                 key={course.id} 
+                to={`/kursus/${course.id}`}
                 className="group block reveal"
                 style={{ transitionDelay: `${index * 0.15}s` }}
               >
@@ -132,13 +175,16 @@ export default function Home() {
                     <img
                       src={course.image}
                       className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                      alt={course.title}
+                      alt={course.name}
                     />
                   </div>
                   
                   <div className="p-5">
                     <p className="text-medium font-bold text-gray-800 leading-tight">
-                      {course.title}
+                      {course.name} 
+                      <span className="ml-2 text-sm font-medium text-primary-purple bg-purple-50 px-2 py-0.5 rounded-md">
+                        {getAgeRangeForCourseType(course.name)}
+                      </span>
                     </p>
                     <div className="mt-2 flex items-center text-sm text-gray-600 transition-colors duration-300 group-hover:text-hover-pink font-semibold">
                       Detail Program <span className="ml-1">→</span>
@@ -164,9 +210,10 @@ export default function Home() {
 
             <button
               onClick={() => scrollPromo(-1)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary-pink hover:bg-hover-pink text-white w-12 h-12 rounded-full z-10 shadow-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-            >
-              <span className="text-xl">❮</span>
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary-pink hover:bg-hover-pink text-white w-12 h-12 rounded-full z-10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+              <path fillRule="evenodd" d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z" clipRule="evenodd" />
+            </svg>
             </button>
 
             <div
@@ -190,54 +237,86 @@ export default function Home() {
 
             <button
               onClick={() => scrollPromo(1)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary-pink hover:bg-hover-pink text-white w-12 h-12 rounded-full z-10 shadow-sm flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-            >
-              <span className="text-xl">❯</span>
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary-pink hover:bg-hover-pink text-white w-12 h-12 rounded-full z-10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clipRule="evenodd" />
+              </svg>
             </button>
-
           </div>
         </div>
       </section>
 
     <section className="py-16 bg-white overflow-hidden">
-      <div className="container mx-auto px-6 lg:px-24">
-        
-        <div className="text-center mb-8 reveal">
+      <div className="container mx-auto px-6 lg:px-42">
+        <div className="text-center mb-4 reveal">
           <h2 className="text-4xl font-extrabold text-gray-900">
             Apa <span className="text-primary-pink">Kata Mereka</span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-24">
-          {reviews.map((review, index) => (
-            <div
-              key={review.id}
-              className="bg-white rounded-2xl p-8 shadow-lg flex flex-col reveal"
-              style={{ transitionDelay: `${index * 0.15}s` }}
-            >
-              <div className="flex items-center gap-4 mb-5">
-                <img
-                  src={review.image}
-                  alt={review.name}
-                  className="w-14 h-14 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="font-bold text-primary-pink text-md">
-                    {review.name}
-                  </h3>
-                  <p className="text-sm text-gray-400 font-medium">
-                    {review.role}
-                  </p>
+        <div className="relative group">
+          <div className="mt-10 flex items-center justify-center gap-6 max-w-md mx-auto"></div>
+
+            <div 
+              ref={scrollRef}
+              className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-10 px-4">
+              {reviews.map((review, index) => (
+                <div
+                  key={review.id}
+                  className="min-w-full md:min-w-[calc(50%-12px)] lg:min-w-[calc(33.333%-16px)] snap-center bg-white rounded-3xl p-8 shadow-xl border border-gray-50 flex flex-col reveal"
+                  style={{ transitionDelay: `${index * 0.1}s` }}>
+                  <div className="flex items-center gap-4 mb-5">
+                    <img
+                      src={review.image}
+                      alt={review.name}
+                      className="w-14 h-14 rounded-full object-cover border-2 border-pink-100"/>
+                    <div>
+                      <h3 className="font-bold text-primary-pink text-lg leading-tight">
+                        {review.parents_name}
+                      </h3>
+                      <p className="text-sm text-gray-400 font-medium">
+                        Parents
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-gray-600 leading-relaxed text-sm overflow-y-auto h-40 pr-3 custom-scrollbar">
+                    "{review.review_content}"
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="container mx-auto px-6 lg:px-24">
+            <div className="flex items-center gap-8 max-w-full mx-auto">
+              <button
+                onClick={() => scroll("left")}
+                className="text-black hover:text-primary-pink transition-alltransition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+
+              <div className="relative flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="absolute top-0 left-0 h-full bg-primary-pink transition-all duration-300 ease-out"
+                  style={{ width: `${scrollProgress}%` }}
+                ></div>
               </div>
 
-              <div className="text-gray-600 leading-relaxed text-sm overflow-y-auto h-48 pr-3 custom-scrollbar">
-                "{review.text}"
-              </div>
+              <button
+                onClick={() => scroll("right")}
+                className="text-black hover:text-primary-pink transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
     </section>
 
       <section className="py-20 bg-white overflow-hidden">
@@ -252,16 +331,20 @@ export default function Home() {
             <div className="flex gap-4">
               <button
                 onClick={() => scrollEvent(-1)}
-                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink/20 transition-colors"
-              >
-                <span className="text-xl">←</span>
+                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                  <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+                </svg>
+
               </button>
 
               <button
                 onClick={() => scrollEvent(1)}
-                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink/20 transition-colors"
-              >
-                <span className="text-xl">→</span>
+                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                  <path fillRule="evenodd" d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                </svg>
+
               </button>
             </div>
           </div>
@@ -271,10 +354,14 @@ export default function Home() {
             className="flex gap-8 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory pb-8 lg:mx-32" 
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {events.map((event) => (
-              <div
+            {events.map((event, index) => (
+              <button
                 key={event.id}
+                type="button"
+                onClick={() => setSelectedEvent(event)}
                 className="w-full lg:w-[calc(50%-16px)] shrink-0 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 snap-start group"
+                style={{ transitionDelay: `${index * 0.1}s` }}
+                aria-label={`Lihat detail kegiatan ${event.name}`}
               >
                 <div className="overflow-hidden">
                   <img
@@ -292,14 +379,69 @@ export default function Home() {
                     <span className="text-base font-medium">{event.event_date}</span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 leading-snug group-hover:text-hover-pink transition-colors">
+                  <h3 className="text-xl text-left font-semibold text-gray-900 leading-snug group-hover:text-hover-pink transition-colors">
                     {event.name}
                   </h3>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
+      {selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/50 backdrop-blur-[3px] cursor-default w-full h-full"
+            onClick={() => setSelectedEvent(null)}
+            aria-label="Tutup modal"
+          />
+
+          <dialog
+            className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden relative flex flex-row focus:outline-none animate-in zoom-in-95 duration-300"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+          >
+
+            <button
+              onClick={() => setSelectedEvent(null)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full border-[1.5px] border-primary-pink bg-white text-primary-pink hover:bg-primary-pink hover:text-white transition-all"
+              aria-label="Tutup"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="w-85 h-85 shrink-0 overflow-hidden rounded-xl m-8">
+              <img
+                src={selectedEvent.image}
+                alt={`Foto kegiatan ${selectedEvent.name}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="flex-1 py-8 pr-6 flex flex-col justify-start">
+
+              <div className="flex items-center gap-2 text-primary-pink mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="text-sm font-medium">{selectedEvent.event_date}</span>
+              </div>
+
+              <h2 id="modal-title" className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                {selectedEvent.name}
+              </h2>
+
+              <p className="text-gray-800 text-sm leading-relaxed text-justify">
+                {selectedEvent.description}
+              </p>
+
+            </div>
+          </dialog>
+        </div>
+      )}
           <div className="flex justify-center mt-6">
             <a
               href="/kegiatan"
@@ -311,7 +453,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-linear-to-b from-transparent via-30% via-pink-200 to-blue-200 text-center">
+
+      <section className="py-24 bg-linear-to-b from-transparent via-30% via-primary-pink/40 to-primary-blue/40 text-center">
 
         <h2 className="text-4xl font-bold mb-4 mt-4">
             Start Your Journey as a <span className="text-primary-pink">Future Coder!</span>

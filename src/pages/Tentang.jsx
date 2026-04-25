@@ -8,6 +8,7 @@ export default function Tentang() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.title = "Tentang Kami | Koding Next Samarinda";
 
     const observerOptions = {
       threshold: 0.1,

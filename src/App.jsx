@@ -7,9 +7,7 @@ import Kursus from "./pages/Kursus";
 import Kegiatan from "./pages/Kegiatan";
 import Lokasi from "./pages/Lokasi";
 import Tentang from "./pages/Tentang";
-import JuniorKoders from "./pages/JuniorKoders";
-import LittleKoders from "./pages/LittleKoders";
-import RoboNext from "./pages/RoboNext";
+import CourseDispatcher from "./CourseDispatcher";
 
 export default function App() {
   return (
@@ -27,9 +25,7 @@ export default function App() {
         <Route path="/kegiatan" element={<Kegiatan/>} />
         <Route path="/lokasi" element={<Lokasi/>} />
         <Route path="/tentangkami" element={<Tentang/>} />
-        <Route path="/kursus/junior-koders" element={<JuniorKoders/>} />
-        <Route path="/kursus/little-koders" element={<LittleKoders/>} />
-        <Route path="/kursus/robonext" element={<RoboNext/>} />
+        <Route path="/kursus/:id" element={<CourseDispatcher />} />
       </Routes>
 
       {}

@@ -2,23 +2,23 @@ import posterLK from "../images/poster-LK.avif";
 import posterJK from "../images/poster-JK.avif";
 import posterRobo from "../images/poster-RoboNext.avif";
 
-export const courses = [
+export const courseTypes = [
   {
     id: 1,
-    title: "Little Koders (4-8 Tahun)",
+    name: "Little Koders",
+    description: "Kursus ini dirancang untuk anak-anak usia 4-8 tahun yang ingin belajar coding dengan pendekatan yang menyenangkan dan interaktif.",
     image: posterLK,
-    link: "/kursus/little-koders",
   },
   {
     id: 2,
-    title: "Junior Koders (8-16 Tahun)",
+    name: "Junior Koders",
+    description: "Kursus ini dirancang untuk anak-anak usia 8-16 tahun yang ingin belajar coding dengan pendekatan yang menyenangkan dan interaktif.",
     image: posterJK,
-    link: "/kursus/junior-koders",
   },
   {
     id: 3,
-    title: "RoboNext (4-16 Tahun)",
+    name: "RoboNext",
+    description: "Kursus ini dirancang untuk anak-anak usia 4-16 tahun yang ingin belajar coding dengan pendekatan yang menyenangkan dan interaktif.",
     image: posterRobo,
-    link: "/kursus/robonext",
   },
 ];

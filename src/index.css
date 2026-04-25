@@ -4,15 +4,15 @@
 @theme {
     --color-primary-pink: #E4559B;
     --color-secondary-pink: #FCEEF5;
-    --color-hover-pink: #cd4d8c;
+    --color-hover-pink: #CD4D8C;
 
     --color-primary-blue: #51A7D3;
-    --color-secondary-blue: #C9E4F1;
-    --color-hover-blue: #2886C6;
+    --color-secondary-blue: #EEF6FB;
+    --color-hover-blue: #4996BE;
 
     --color-primary-purple: #2E0065;
-    --color-secondary-purple: #BEB0CF;
-    --color-hover-purple: #23004C;
+    --color-secondary-purple: #EAE6F0;
+    --color-hover-purple: #29005B;
 
     --font-sans: 'Poppins', sans-serif;
 }
@@ -131,4 +131,11 @@ margin-left:80px;
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #E43292;
 }
-x
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

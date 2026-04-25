@@ -5,7 +5,7 @@ export const events = [
     id: 1,
     name: "Fun day Chinese New Year",
     event_date: "2026-03-15",
-    description: "Event perayaan Tahun Baru China.",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     image: eventimg,
     created_by: 1
   },

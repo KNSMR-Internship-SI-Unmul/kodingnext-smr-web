@@ -4,6 +4,7 @@ import lokasiImg from "../assets/images/lokasi-kn.jpeg";
 export default function Lokasi() {
   
   useEffect(() => {
+    document.title = "Lokasi | Koding Next Samarinda";
     window.scrollTo(0, 0);
     const observerOptions = {
       threshold: 0.15,

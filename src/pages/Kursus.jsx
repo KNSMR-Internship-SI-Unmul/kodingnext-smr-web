@@ -1,9 +1,10 @@
-import { useEffect } from "react"; // Pastikan useEffect diimport
+import { useEffect } from "react"; 
 import { Link } from "react-router-dom";
-import { courses } from "../assets/data/courseTypes";
+import { courseTypes } from "../assets/data/courseTypes";
 
 export default function Kursus() {
   useEffect(() => {
+    document.title = "Kursus | Koding Next Samarinda";
     window.scrollTo(0, 0);
     const observerOptions = {
       threshold: 0.1,
@@ -38,9 +39,9 @@ export default function Kursus() {
           </div>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:px-20"> 
-            {/* Pastikan data 'courses' tidak kosong */}
-            {courses && courses.length > 0 ? (
-              courses.map((course, index) => (
+            {/* Pastikan data 'courseType' tidak kosong */}
+            {courseTypes && courseTypes.length > 0 ? (
+              courseTypes.map((course, index) => (
                 <Link 
                   to={course.link} 
                   key={course.id} 

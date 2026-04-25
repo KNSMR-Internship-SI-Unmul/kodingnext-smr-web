@@ -1,3 +1,5 @@
+import logoImg from "../assets/images/logo-kn.png";
+
 export default function Footer() {
   return (
     <footer className="bg-white text-black border-t border-gray-300">
@@ -6,9 +8,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start gap-8">
           <div className="max-w-md">
             <img
-              src="src/assets/images/logo-kn.png"
-              alt="Koding Next"
-              className="h-10 mb-4"
+              src={logoImg} alt="Koding Next Logo" className="h-10 mb-4"
             />
             <p className="text-sm leading-relaxed">
               Jl. Imam Bonjol No.02, Pelabuhan, Kec. Samarinda Kota,<br />
