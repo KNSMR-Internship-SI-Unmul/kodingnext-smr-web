@@ -3,7 +3,6 @@ import { team } from "../assets/data/team";
 import { useEffect } from "react";
 
 export default function Tentang() {
-  
   const owner = team[0];
 
   useEffect(() => {
@@ -40,8 +39,9 @@ export default function Tentang() {
 
         <div className="relative container mx-auto px-6 lg:px-24">
           <div className="lg:pl-20 reveal-left">
-            <h1 className="text-white text-shadow-lg text-6xl font-bold leading-tight"> 
-              Tentang <br />Kami
+            <h1 className="text-white text-shadow-lg text-6xl font-bold leading-tight">
+              Tentang <br />
+              Kami
             </h1>
           </div>
         </div>
@@ -57,8 +57,10 @@ export default function Tentang() {
               Through Coding
             </h3>
             <p className="text-gray-700 mt-8 text-lg leading-relaxed max-w-3xl mx-auto">
-              Kami berkomitmen untuk memberikan pendidikan teknologi terbaik bagi anak-anak di Samarinda, 
-              mempersiapkan mereka menjadi pencipta solusi masa depan melalui kurikulum yang inovatif dan menyenangkan.
+              Kami berkomitmen untuk memberikan pendidikan teknologi terbaik
+              bagi anak-anak di Samarinda, mempersiapkan mereka menjadi pencipta
+              solusi masa depan melalui kurikulum yang inovatif dan
+              menyenangkan.
             </p>
           </div>
         </div>
@@ -84,12 +86,13 @@ export default function Tentang() {
 
             <div className="space-y-4 text-gray-600 text-medium leading-relaxed">
               <p>
-                Koding Next Samarinda didirikan dengan semangat untuk membawa standar pendidikan 
-                coding internasional ke Kalimantan Timur.
+                Koding Next Samarinda didirikan dengan semangat untuk membawa
+                standar pendidikan coding internasional ke Kalimantan Timur.
               </p>
               <p>
-                Kami percaya bahwa setiap anak memiliki potensi untuk menjadi inovator digital 
-                berikutnya jika diberikan alat dan bimbingan yang tepat.
+                Kami percaya bahwa setiap anak memiliki potensi untuk menjadi
+                inovator digital berikutnya jika diberikan alat dan bimbingan
+                yang tepat.
               </p>
             </div>
           </div>
@@ -105,35 +108,32 @@ export default function Tentang() {
           </div>
 
           <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-32">
-            {team
-              .slice(1)
-              .map((member) => (
-                <div 
-                  key={member.id} 
-                  className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
-                >
-                  <div className="overflow-hidden rounded-lg aspect-3/3">
-                    <img
-                      src={member.image}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      alt={member.name}
-                    />
-                  </div>
-                  
-                  <div className="py-3 text-center">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-hover-pink transition-colors leading-tight">
-                      {member.name}
-                    </h3>
-                    <p className="text-primary-pink text-sm mt-1 font-semibold uppercase tracking-wider">
-                      {member.role}
-                    </p>
-                  </div>
+            {team.slice(1).map((member) => (
+              <div
+                key={member.id}
+                className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
+              >
+                <div className="overflow-hidden rounded-lg aspect-3/3">
+                  <img
+                    src={member.image}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    alt={member.name}
+                  />
                 </div>
-              ))}
+
+                <div className="py-3 text-center">
+                  <h3 className="font-bold text-lg text-gray-900 group-hover:text-hover-pink transition-colors leading-tight">
+                    {member.name}
+                  </h3>
+                  <p className="text-primary-pink text-sm mt-1 font-semibold uppercase tracking-wider">
+                    {member.role}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-
     </div>
   );
 }

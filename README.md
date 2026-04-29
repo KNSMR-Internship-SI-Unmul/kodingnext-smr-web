@@ -1,16 +1,71 @@
-# React + Vite
+# Website Profile - Koding Next Samarinda
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website profil resmi Koding Next Samarinda yang dirancang untuk memberikan informasi lengkap mengenai program kursus robotika dan pemrograman, kurikulum pembelajaran, serta pameran hasil karya siswa secara interaktif.
 
-Currently, two official plugins are available:
+## 🚀 Fitur Utama
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Kategori Kursus:** Navigasi khusus untuk berbagai level usia:
+  - **Little Koders:** 4-8 Tahun
+  - **Junior Koders:** 8-16 Tahun
+  - **RoboNext:** 4-16 Tahun 
+- **Roadmap Pembelajaran:** Jalur belajar interaktif yang membantu calon siswa memahami tahapan materi dari level dasar hingga mahir.
+- **Gambaran Proyek Siswa:** Galeri proyek terpusat yang dapat difilter berdasarkan nama modul, kategori program, rentang usia, dan nama siswa
 
-## React Compiler
+## 🛠️ Stack Teknologi
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Core Framework:** [React.js](https://reactjs.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Routing:** [React Router DOM](https://reactrouter.com/)
+- **State Management:** React Hooks (useState, useMemo, useEffect)
+- **Animation:** CSS Transitions & Tailwind Animate
+- **Icons:** Heroicons & Lucide Icons
 
-## Expanding the ESLint configuration
+## 📋 Prasyarat
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Sebelum menjalankan proyek, pastikan perangkat Anda memiliki:
+- Node.js v18.0.0 atau lebih baru
+- npm, yarn, atau pnpm
+
+## 🔧 Panduan Instalasi
+
+1. **Clone repositori:**
+   ```bash
+   git clone [https://github.com/username/koding-next-profile.git](https://github.com/username/koding-next-profile.git)
+
+2. **Masuk ke direktori proyek:**
+   ```bash 
+   cd koding-next-profile
+
+3. Instal seluruh dependensi:
+   ```bash 
+   npm install
+
+4. Jalankan aplikasi (Development):
+   ```bash 
+   npm run dev
+
+5. Build untuk produksi:
+   ```bash 
+   npm run build
+
+## 📁 Arsitektur Proyek
+```text
+web-kn/
+├── public/                   # Aset statis yang tidak diproses (favicon, index.html)
+├── src/                      # Folder utama kode sumber
+│   ├── assets/               # Data dummy dan gambar
+│   ├── components/           # Komponen React (navbar dan footer) yang bisa digunakan kembali
+│   ├── pages/                # Komponen utama yang merepresentasikan rute/halaman
+│   ├── services/             # Konfigurasi API dan pengambilan data
+│   ├── App.jsx               # Komponen utama aplikasi
+│   ├── CourseDispatcher.jsx  # komponen pengontrol navigasi internal
+│   ├── index.css             # Stylesheet utama dengan Tailwind CSS
+│   └── main.jsx              # Titik masuk (entry point) React
+├── .gitignore                # Daftar file yang diabaikan oleh Git
+├── eslint.config.js          # konfigurasi ESLint
+├── index.html                # HTML utama sebagai rangka dasar (entry point)
+├── package-lock.json         # Informasi dependensi yang terinstal
+├── package.json              # Informasi dependensi dan skrip proyek
+├── README.md                 # Dokumentasi proyek
+└── .gitignore                # Daftar file yang diabaikan oleh Git
+```

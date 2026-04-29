@@ -1,44 +1,68 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "tailwindcss";
 
 @theme {
-    --color-primary-pink: #E4559B;
-    --color-secondary-pink: #FCEEF5;
-    --color-hover-pink: #CD4D8C;
+  --color-primary-pink: #e4559b;
+  --color-secondary-pink: #fceef5;
+  --color-hover-pink: #cd4d8c;
 
-    --color-primary-blue: #51A7D3;
-    --color-secondary-blue: #EEF6FB;
-    --color-hover-blue: #4996BE;
+  --color-primary-blue: #51a7d3;
+  --color-secondary-blue: #eef6fb;
+  --color-hover-blue: #4996be;
 
-    --color-primary-purple: #2E0065;
-    --color-secondary-purple: #EAE6F0;
-    --color-hover-purple: #29005B;
+  --color-primary-purple: #2e0065;
+  --color-secondary-purple: #eae6f0;
+  --color-hover-purple: #29005b;
 
-    --font-sans: 'Poppins', sans-serif;
+  --font-sans: "Poppins", sans-serif;
 }
 
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
   }
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
+  50% {
+    transform: translateY(-20px);
   }
+  100% {
+    transform: translateY(0px);
+  }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
 
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-50px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(50px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .animate-slide-left {
@@ -55,32 +79,32 @@
 }
 
 .no-scrollbar::-webkit-scrollbar {
-display: none;
+  display: none;
 }
 
 .no-scrollbar {
--ms-overflow-style: none;
-scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-#sidebar.collapsed{
-width:80px;
+#sidebar.collapsed {
+  width: 80px;
 }
 
-#sidebar.collapsed .sidebar-text{
-display:none;
+#sidebar.collapsed .sidebar-text {
+  display: none;
 }
 
-#sidebar.collapsed .sidebar-logo{
-display:none;
+#sidebar.collapsed .sidebar-logo {
+  display: none;
 }
 
-#sidebar.collapsed nav a{
-justify-content:center;
+#sidebar.collapsed nav a {
+  justify-content: center;
 }
 
-#content.expanded{
-margin-left:80px;
+#content.expanded {
+  margin-left: 80px;
 }
 
 .reveal {
@@ -94,7 +118,6 @@ margin-left:80px;
   transform: translateY(0);
 }
 
-/* Animasi Khusus Samping */
 .reveal-left {
   opacity: 0;
   transform: translateX(-50px);
@@ -125,11 +148,11 @@ margin-left:80px;
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #E4559B;
+  background: #e4559b;
   border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #E43292;
+  background: #e43292;
 }
 
 .hide-scrollbar::-webkit-scrollbar {

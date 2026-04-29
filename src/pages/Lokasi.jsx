@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import lokasiImg from "../assets/images/lokasi-kn.jpeg";
 
 export default function Lokasi() {
-  
   useEffect(() => {
     document.title = "Lokasi | Koding Next Samarinda";
     window.scrollTo(0, 0);
@@ -29,7 +28,6 @@ export default function Lokasi() {
       <section className="py-20 overflow-hidden">
         <div className="container mx-auto px-6 lg:px-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            
             <div className="lg:pl-20 reveal-left">
               <h2 className="text-4xl font-extrabold mb-4 text-gray-900 leading-tight">
                 Lokasi <span className="text-primary-pink">Kami</span>
@@ -38,25 +36,56 @@ export default function Lokasi() {
               <div className="space-y-6">
                 <div className="flex gap-3 items-start">
                   <div className="p-2 rounded-lg text-primary-pink">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                   </div>
                   <p className="text-gray-800 text-lg leading-relaxed">
-                    Jl. Imam Bonjol No.02, Pelabuhan, Kec. Samarinda Kota, Kota Samarinda, Kalimantan Timur
+                    Jl. Imam Bonjol No.02, Pelabuhan, Kec. Samarinda Kota, Kota
+                    Samarinda, Kalimantan Timur
                   </p>
                 </div>
 
                 <div className="flex gap-3 items-start">
                   <div className="p-2 rounded-lg text-primary-pink">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
                     <p className="text-gray-800 text-lg">
-                      <span className="font-bold text-primary-pink">Jam Operasional:</span> <br />
+                      <span className="font-bold text-primary-pink">
+                        Jam Operasional:
+                      </span>{" "}
+                      <br />
                       Senin – Minggu | 10:00 – 18:00 WITA
                     </p>
                   </div>

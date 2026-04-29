@@ -1,8 +1,8 @@
 import heroImg from "../assets/images/lk.jpg";
 import mascotImg2 from "../assets/images/mascot2.png";
-import React, { useState, useEffect, useRef, useMemo} from 'react';
-import { modules } from '../assets/data/modules';
-import { studentProjects } from '../assets/data/studentProjects';
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { modules } from "../assets/data/modules";
+import { studentProjects } from "../assets/data/studentProjects";
 
 export default function LittleKoders() {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -14,7 +14,7 @@ export default function LittleKoders() {
 
   const filteredModules = useMemo(() => {
     return modules
-      .filter((c) => c.course_type === 'Little Koders')
+      .filter((c) => c.course_type === "Little Koders")
       .sort((a, b) => a.id - b.id);
   }, []);
 
@@ -27,26 +27,27 @@ export default function LittleKoders() {
     return [...new Set(filteredModules.map((c) => c.age_range))];
   }, [filteredModules]);
 
-    const littleModuleNames = useMemo(() => {
-      const names = modules
-        .filter((m) => m.course_type === 'Little Koders')
-        .map((m) => m.name);
-      return new Set(names);
-    }, []);
+  const littleModuleNames = useMemo(() => {
+    const names = modules
+      .filter((m) => m.course_type === "Little Koders")
+      .map((m) => m.name);
+    return new Set(names);
+  }, []);
 
-    const projectList = useMemo(() => {
-      return studentProjects.filter((p) => {
-        // Cek eksistensi menggunakan Set (O(1) complexity)
-        const isRoboModule = littleModuleNames.has(p.modules);
-        
-        const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
-        
-        const ageRange = getAgeRange(p.modules);
-        const matchesAge = selectedAge === "" || ageRange === selectedAge;
+  const projectList = useMemo(() => {
+    return studentProjects.filter((p) => {
+      const isRoboModule = littleModuleNames.has(p.modules);
 
-        return isRoboModule && matchesSearch && matchesAge;
-      });
-    }, [searchQuery, selectedAge, littleModuleNames]);
+      const matchesSearch = p.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      const ageRange = getAgeRange(p.modules);
+      const matchesAge = selectedAge === "" || ageRange === selectedAge;
+
+      return isRoboModule && matchesSearch && matchesAge;
+    });
+  }, [searchQuery, selectedAge, littleModuleNames]);
 
   const currentProject = projectList[projectIndex] || null;
 
@@ -68,7 +69,7 @@ export default function LittleKoders() {
       dialogRef.current.close();
     }
     setSelectedCourse(null);
-    window.scrollTo({ top: scrollPosRef.current, behavior: 'instant' });
+    window.scrollTo({ top: scrollPosRef.current, behavior: "instant" });
   };
 
   useEffect(() => {
@@ -78,13 +79,12 @@ export default function LittleKoders() {
     if (dialog.open) dialog.close();
     dialog.showModal();
     requestAnimationFrame(() => {
-      window.scrollTo({ top: scrollPosRef.current, behavior: 'instant' });
+      window.scrollTo({ top: scrollPosRef.current, behavior: "instant" });
     });
   }, [selectedCourse]);
 
   return (
     <div className="min-h-screen">
-
       <section className="relative w-full h-120 flex items-center">
         <img
           src={heroImg}
@@ -97,7 +97,9 @@ export default function LittleKoders() {
               Little Koders
             </h2>
             <p className="text-gray-700 text-sm leading-relaxed mb-6">
-              Program kursus koding untuk anak-anak yang dirancang untuk memperkenalkan teknologi melalui pengalaman langsung yang menyenangkan dan interaktif.
+              Program kursus koding untuk anak-anak yang dirancang untuk
+              memperkenalkan teknologi melalui pengalaman langsung yang
+              menyenangkan dan interaktif.
             </p>
             <div className="flex gap-3">
               <button className="bg-primary-pink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-pink transition-colors">
@@ -122,61 +124,59 @@ export default function LittleKoders() {
           <div className="absolute left-1/2 transform -translate-x-1/2 w-1.5 bg-primary-pink h-full rounded-full hidden md:block" />
 
           <div className="-space-y-8">
-          {/* Gunakan (m, index) untuk mengambil posisi urutan di array */}
             {filteredModules.map((m, index) => {
-              // side tetap menggunakan index agar zig-zag tetap rapi
-              const side = index % 2 === 0 ? 'left' : 'right';
-              // Buat variabel angka urut (index dimulai dari 0, jadi +1)
+              const side = index % 2 === 0 ? "left" : "right";
               const displayNumber = index + 1;
 
               return (
                 <div key={m.id} className="flex items-center relative">
-
-                  {/* Sisi kiri */}
                   <div className="w-[calc(50%-20px)] flex justify-end items-center pr-2">
-                    {side === 'left' && (
+                    {side === "left" && (
                       <button
                         className="relative inline-block text-left w-full group"
                         onClick={() => openModal(m)}
                         aria-label={`Lihat detail ${m.name}`}
                       >
-                        {/* GANTI m.id MENJADI displayNumber */}
                         <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full shadow-md flex items-center justify-center text-white font-semibold text-3xl">
                           {displayNumber}
                         </div>
                         <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl group-hover:border-primary-pink">
-                          <h3 className="text-primary-pink font-semibold text-xl mb-1">{m.name}</h3>
-                          <p className="text-xs font-medium text-gray-800">Usia: {m.age_range} ({m.duration_per_session})</p>
+                          <h3 className="text-primary-pink font-semibold text-xl mb-1">
+                            {m.name}
+                          </h3>
+                          <p className="text-xs font-medium text-gray-800">
+                            Usia: {m.age_range} ({m.duration_per_session})
+                          </p>
                         </div>
                       </button>
                     )}
                   </div>
 
-                  {/* Bulatan tengah */}
                   <div className="w-24 shrink-0 flex items-center justify-center z-10">
                     <div className="w-4 h-4 bg-primary-pink rounded-full shadow" />
                   </div>
 
-                  {/* Sisi kanan */}
                   <div className="w-[calc(50%-20px)] flex justify-start items-center pl-2">
-                    {side === 'right' && (
+                    {side === "right" && (
                       <button
                         className="relative inline-block text-left w-full group"
                         onClick={() => openModal(m)}
                         aria-label={`Lihat detail ${m.name}`}
                       >
                         <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl group-hover:border-primary-pink">
-                          <h3 className="text-primary-pink font-semibold text-xl mb-1">{m.name}</h3>
-                          <p className="text-xs font-medium text-gray-800">Usia: {m.age_range} ({m.duration_per_session})</p>
+                          <h3 className="text-primary-pink font-semibold text-xl mb-1">
+                            {m.name}
+                          </h3>
+                          <p className="text-xs font-medium text-gray-800">
+                            Usia: {m.age_range} ({m.duration_per_session})
+                          </p>
                         </div>
-                        {/* GANTI m.id MENJADI displayNumber */}
                         <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full shadow-md flex items-center justify-center text-white font-semibold text-3xl">
                           {displayNumber}
                         </div>
                       </button>
                     )}
                   </div>
-
                 </div>
               );
             })}
@@ -220,15 +220,24 @@ export default function LittleKoders() {
               }}
               className={`
                 border-2 rounded-lg px-4 py-2 text-base outline-none w-32 md:w-130 transition-colors ${
-                  searchQuery !== ""
+                  searchQuery === ""
                     ? "border-primary-pink"
                     : "border-gray-300 focus:border-primary-pink"
                 }
               `}
             />
             <div className="absolute right-3 top-2.5 text-gray-500">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
-                <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="size-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                  clipRule="evenodd"
+                />
               </svg>
             </div>
           </div>
@@ -236,8 +245,6 @@ export default function LittleKoders() {
 
         {currentProject ? (
           <div className="bg-white rounded-[40px] max-w-4xl mx-auto shadow-2xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
-
-            {/* Kiri — gambar */}
             <div className="md:w-1/2 relative group shrink-0">
               <div className="rounded-3xl w-full h-80 bg-gray-200 overflow-hidden">
                 <img
@@ -246,13 +253,11 @@ export default function LittleKoders() {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
-              {currentProject.media_type !== 'gif' && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                </div>
+              {currentProject.media_type !== "gif" && (
+                <div className="absolute inset-0 flex items-center justify-center"></div>
               )}
             </div>
 
-            {/* Kanan — konten */}
             <div className="md:w-1/2 flex flex-col">
               <h3 className="text-3xl font-semibold text-gray-900 mb-2 line-clamp-2">
                 {currentProject.title}
@@ -269,8 +274,17 @@ export default function LittleKoders() {
                   className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-primary-pink hover:text-white transition-colors"
                   aria-label="Sebelumnya"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-                    <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
                 <button
@@ -278,13 +292,21 @@ export default function LittleKoders() {
                   className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-primary-pink hover:text-white transition-colors"
                   aria-label="Berikutnya"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-                    <path fillRule="evenodd" d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </button>
               </div>
             </div>
-
           </div>
         ) : (
           <div className="text-center py-20">
@@ -293,7 +315,6 @@ export default function LittleKoders() {
         )}
       </section>
 
-      {/* MODAL — di paling bawah */}
       <dialog
         ref={dialogRef}
         className="hidden open:flex fixed inset-0 z-50 m-auto bg-white rounded-xl p-8 w-[90%] md:w-137.5 h-auto max-h-[90vh] md:max-h-84 flex-col gap-2 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[3px] overflow-hidden border-b-4 border-b-primary-pink"
@@ -301,14 +322,24 @@ export default function LittleKoders() {
       >
         {selectedCourse && (
           <div className="relative w-full flex flex-col">
-
             <button
               className="absolute -top-2 -right-2 w-8 h-8 flex items-center justify-center rounded-full text-primary-pink border-[1.5px] border-primary-pink hover:bg-primary-pink hover:text-white transition-colors z-50"
               onClick={closeModal}
               aria-label="Tutup modal"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
@@ -317,13 +348,13 @@ export default function LittleKoders() {
                 {selectedCourse.name}
               </h2>
               <p className="text-center text-gray-600 text-xs font-medium">
-                Usia {selectedCourse.age_range} ({selectedCourse.duration_per_session})
+                Usia {selectedCourse.age_range} (
+                {selectedCourse.duration_per_session})
               </p>
             </div>
 
             <div className="flex flex-col md:flex-row items-end gap-4">
               <div className="flex flex-col md:flex-row items-end gap-6 w-full relative">
-
                 <div className="flex-1 self-stretch flex flex-col justify-start">
                   <div className="mb-3">
                     <span className="bg-primary-pink text-white text-[10px] tracking-wider font-medium px-3 py-1 rounded-md inline-block">
@@ -342,14 +373,11 @@ export default function LittleKoders() {
                     className="w-full h-auto object-contain"
                   />
                 </div>
-
               </div>
             </div>
-
           </div>
         )}
       </dialog>
-
     </div>
   );
 }

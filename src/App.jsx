@@ -12,7 +12,6 @@ import CourseDispatcher from "./CourseDispatcher";
 export default function App() {
   return (
     <BrowserRouter>
-      
       {}
       <Navbar />
 
@@ -21,16 +20,15 @@ export default function App() {
         <Route path="/" element={<Home />} />
 
         {}
-        <Route path="/kursus" element={<Kursus/>} />
-        <Route path="/kegiatan" element={<Kegiatan/>} />
-        <Route path="/lokasi" element={<Lokasi/>} />
-        <Route path="/tentangkami" element={<Tentang/>} />
+        <Route path="/kursus" element={<Kursus />} />
+        <Route path="/kegiatan" element={<Kegiatan />} />
+        <Route path="/lokasi" element={<Lokasi />} />
+        <Route path="/tentangkami" element={<Tentang />} />
         <Route path="/kursus/:id" element={<CourseDispatcher />} />
       </Routes>
 
       {}
       <Footer />
-
     </BrowserRouter>
   );
 }
