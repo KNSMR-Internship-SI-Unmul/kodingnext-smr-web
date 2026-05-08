@@ -1,111 +1,148 @@
 import heroImg from "../assets/images/lk.jpg";
 import mascotImg2 from "../assets/images/mascot2.png";
+import LoadingScreen from "../components/LoadingScreen";
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { modules } from "../assets/data/modules";
+import { service } from "../services/service";
 import { studentProjects } from "../assets/data/studentProjects";
 
 export default function LittleKoders() {
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [projectIndex, setProjectIndex] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [courseDetail, setCourseDetail] = useState(null);
+  const [modules, setModules] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [selectedAge, setSelectedAge] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [projectIndex, setProjectIndex] = useState(0);
+
+  const COURSE_ID = 1;
   const dialogRef = useRef(null);
   const scrollPosRef = useRef(0);
+  const ageCategories = ["8-12 Tahun", "12-16 Tahun"];
 
-  const filteredModules = useMemo(() => {
-    return modules
-      .filter((c) => c.course_type === "Little Koders")
-      .sort((a, b) => a.id - b.id);
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        setLoading(true);
+        const [resCourse, resModules] = await Promise.all([
+          service.getCourseById(COURSE_ID),
+          service.getModules(COURSE_ID),
+        ]);
+        setCourseDetail(resCourse?.data || resCourse);
+        setModules(resModules?.data || resModules || []);
+        setProjects(studentProjects);
+      } catch (error) {
+        console.error("Gagal mengambil data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllData();
   }, []);
 
-  const getAgeRange = (courseName) => {
-    const found = modules.find((c) => c.name === courseName);
-    return found?.age_range ?? "";
-  };
-
-  const ageCategories = useMemo(() => {
-    return [...new Set(filteredModules.map((c) => c.age_range))];
-  }, [filteredModules]);
-
-  const littleModuleNames = useMemo(() => {
-    const names = modules
-      .filter((m) => m.course_type === "Little Koders")
-      .map((m) => m.name);
-    return new Set(names);
-  }, []);
-
-  const projectList = useMemo(() => {
-    return studentProjects.filter((p) => {
-      const isRoboModule = littleModuleNames.has(p.modules);
-
-      const matchesSearch = p.title
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
-      const ageRange = getAgeRange(p.modules);
-      const matchesAge = selectedAge === "" || ageRange === selectedAge;
-
-      return isRoboModule && matchesSearch && matchesAge;
-    });
-  }, [searchQuery, selectedAge, littleModuleNames]);
-
-  const currentProject = projectList[projectIndex] || null;
+  const sortedModules = useMemo(() => {
+    return [...modules].sort((a, b) => a.id - b.id);
+  }, [modules]);
 
   const prevProject = () => {
-    setProjectIndex((prev) => (prev === 0 ? projectList.length - 1 : prev - 1));
+    setProjectIndex((prev) => (prev === 0 ? filteredProjects.length - 1 : prev - 1));
   };
 
   const nextProject = () => {
-    setProjectIndex((prev) => (prev === projectList.length - 1 ? 0 : prev + 1));
+    setProjectIndex((prev) => (prev === filteredProjects.length - 1 ? 0 : prev + 1));
   };
 
-  const openModal = (course) => {
+  const openModal = (module) => {
     scrollPosRef.current = window.scrollY;
-    setSelectedCourse(course);
+    setSelectedCourse(module);
   };
 
   const closeModal = () => {
-    if (dialogRef.current?.open) {
-      dialogRef.current.close();
-    }
+    if (dialogRef.current?.open) dialogRef.current.close();
     setSelectedCourse(null);
     window.scrollTo({ top: scrollPosRef.current, behavior: "instant" });
   };
 
-  useEffect(() => {
-    document.title = "Little Koders | Koding Next Samarinda";
-    const dialog = dialogRef.current;
-    if (!dialog || !selectedCourse) return;
-    if (dialog.open) dialog.close();
-    dialog.showModal();
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: scrollPosRef.current, behavior: "instant" });
+  const filteredProjects = useMemo(() => {
+    // Jika projects bukan array atau kosong, kembalikan array kosong
+    if (!Array.isArray(projects) || projects.length === 0) return [];
+
+    return projects.filter((project) => {
+      const matchesAge =
+        selectedAge === "" || project.age_category === selectedAge;
+      const matchesSearch =
+        project.student_name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        false ||
+        project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        false;
+      return matchesAge && matchesSearch;
     });
-  }, [selectedCourse]);
+  }, [projects, selectedAge, searchQuery]);
+
+  // 2. Reset index dengan aman
+  useEffect(() => {
+    setProjectIndex(0);
+  }, [filteredProjects.length]);
+
+  // 3. Ambil project saat ini (Gunakan optional chaining)
+  const currentProject = filteredProjects[projectIndex] || null;
+
+  useEffect(() => {
+    if (courseDetail) {
+      document.title = `${courseDetail.name} | Koding Next Samarinda`;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("active");
+        });
+      },
+      { threshold: 0.1 },
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+    if (dialogRef.current && selectedCourse) {
+      dialogRef.current.showModal();
+    }
+
+    return () => observer.disconnect();
+  }, [selectedCourse, loading, courseDetail]);
+
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen">
-      <section className="relative w-full h-120 flex items-center">
+      <section className="relative w-full h-120 flex items-center reveal">
         <img
           src={heroImg}
           className="absolute inset-0 w-full h-full object-cover"
-          alt="Little Koders"
+          alt={courseDetail?.name}
         />
         <div className="relative max-w-6xl mx-auto px-6 lg:px-16 w-full flex justify-end">
-          <div className="relative p-8 rounded-xl max-w-md bg-white/80 backdrop-blur-md border border-white/20 shadow-2xl">
-            <h2 className="text-5xl font-bold text-primary-pink mb-4">
-              Little Koders
+          <div className="relative p-8 rounded-xl max-w-md bg-white/60 backdrop-blur-sm border border-white/20 shadow-2xl">
+            <h2 className="text-6xl font-bold text-primary-pink mb-4">
+              {courseDetail?.name}
             </h2>
-            <p className="text-gray-700 text-sm leading-relaxed mb-6">
-              Program kursus koding untuk anak-anak yang dirancang untuk
-              memperkenalkan teknologi melalui pengalaman langsung yang
-              menyenangkan dan interaktif.
+            <p className="text-black font-medium text-sm leading-relaxed mb-6">
+              {courseDetail?.description}
             </p>
             <div className="flex gap-3">
-              <button className="bg-primary-pink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-pink transition-colors">
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("modul-section")
+                    .scrollIntoView({ behavior: "smooth" })
+                }
+                className="bg-primary-pink text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-pink transition-colors"
+              >
                 Lihat Modul
               </button>
-              <button className="bg-white border border-primary-pink text-primary-pink px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-pink hover:text-white transition-all">
+
+              <button className="bg-white border-[1.5px] border-primary-pink text-primary-pink px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-colors">
                 Lihat Proyek
               </button>
             </div>
@@ -113,9 +150,9 @@ export default function LittleKoders() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-center text-4xl font-bold mb-14">
+      <section id="modul-section" className="py-16 reveal">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold mb-14">
             Modul <span className="text-primary-pink">Kami</span>
           </h2>
         </div>
@@ -124,28 +161,26 @@ export default function LittleKoders() {
           <div className="absolute left-1/2 transform -translate-x-1/2 w-1.5 bg-primary-pink h-full rounded-full hidden md:block" />
 
           <div className="-space-y-8">
-            {filteredModules.map((m, index) => {
+            {sortedModules.map((m, index) => {
               const side = index % 2 === 0 ? "left" : "right";
-              const displayNumber = index + 1;
-
               return (
-                <div key={m.id} className="flex items-center relative">
+                <div key={m.id} className="flex items-center relative reveal">
                   <div className="w-[calc(50%-20px)] flex justify-end items-center pr-2">
                     {side === "left" && (
                       <button
                         className="relative inline-block text-left w-full group"
                         onClick={() => openModal(m)}
-                        aria-label={`Lihat detail ${m.name}`}
                       >
-                        <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full shadow-md flex items-center justify-center text-white font-semibold text-3xl">
-                          {displayNumber}
+                        <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full flex items-center justify-center text-white font-semibold text-3xl">
+                          {index + 1}
                         </div>
-                        <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl group-hover:border-primary-pink">
+                        <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all group-hover:scale-105 group-hover:border-primary-pink">
                           <h3 className="text-primary-pink font-semibold text-xl mb-1">
                             {m.name}
                           </h3>
                           <p className="text-xs font-medium text-gray-800">
-                            Usia: {m.age_range} ({m.duration_per_session})
+                            Usia: {m.age_range} Tahun ({m.duration_per_session}{" "}
+                            Menit/Sesi)
                           </p>
                         </div>
                       </button>
@@ -153,7 +188,7 @@ export default function LittleKoders() {
                   </div>
 
                   <div className="w-24 shrink-0 flex items-center justify-center z-10">
-                    <div className="w-4 h-4 bg-primary-pink rounded-full shadow" />
+                    <div className="w-4 h-4 bg-primary-pink rounded-full" />
                   </div>
 
                   <div className="w-[calc(50%-20px)] flex justify-start items-center pl-2">
@@ -161,18 +196,18 @@ export default function LittleKoders() {
                       <button
                         className="relative inline-block text-left w-full group"
                         onClick={() => openModal(m)}
-                        aria-label={`Lihat detail ${m.name}`}
                       >
-                        <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl group-hover:border-primary-pink">
+                        <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all group-hover:scale-105 group-hover:border-primary-pink">
                           <h3 className="text-primary-pink font-semibold text-xl mb-1">
                             {m.name}
                           </h3>
                           <p className="text-xs font-medium text-gray-800">
-                            Usia: {m.age_range} ({m.duration_per_session})
+                            Usia: {m.age_range} Tahun ({m.duration_per_session}{" "}
+                            Menit/Sesi)
                           </p>
                         </div>
-                        <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full shadow-md flex items-center justify-center text-white font-semibold text-3xl">
-                          {displayNumber}
+                        <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full flex items-center justify-center text-white font-semibold text-3xl">
+                          {index + 1}
                         </div>
                       </button>
                     )}
@@ -184,7 +219,68 @@ export default function LittleKoders() {
         </div>
       </section>
 
-      <section className="py-10 max-w-5xl mx-auto">
+      <dialog
+        ref={dialogRef}
+        className="hidden open:flex fixed inset-0 z-50 m-auto bg-white rounded-xl p-8 w-[90%] md:w-137.5 h-auto max-h-[90vh] md:max-h-84 flex-col gap-2 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[3px] overflow-hidden border-b-4 border-b-primary-pink"
+        onClose={closeModal}
+      >
+        {selectedCourse && (
+          <div className="relative w-full flex flex-col">
+            <button
+              className="absolute -top-2 -right-2 w-8 h-8 flex items-center justify-center rounded-full text-primary-pink border-[1.5px] border-primary-pink hover:bg-primary-pink hover:text-white transition-colors z-50"
+              onClick={closeModal}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <div className="w-full flex flex-col items-center mb-6">
+              <h2 className="text-2xl font-semibold text-primary-pink text-center mb-1">
+                {selectedCourse.name}
+              </h2>
+              <p className="text-center text-gray-600 text-xs font-medium">
+                Usia {selectedCourse.age_range} Tahun (
+                {selectedCourse.duration_per_session} Menit/Sesi)
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-end gap-6 w-full relative">
+              <div className="flex-1 self-stretch flex flex-col justify-start">
+                <div className="mb-3">
+                  <span className="bg-primary-pink text-white text-xs tracking-wider px-3 py-2 rounded-md inline-block">
+                    Tentang Kursus
+                  </span>
+                </div>
+                <p className="text-xs font-medium text-black leading-relaxed text-justify">
+                  {selectedCourse.description}
+                </p>
+              </div>
+
+              <div className="w-28 md:w-48 shrink-0 z-10 relative -mt-8 -mr-14 -mb-10 -rotate-6 translate-x-2 translate-y-2">
+                <img
+                  src={mascotImg2}
+                  alt="maskot"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </dialog>
+
+      <section id="project-section" className="py-10 max-w-5xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-10">
           Proyek <span className="text-primary-pink">Siswa</span>
         </h2>
@@ -196,7 +292,6 @@ export default function LittleKoders() {
               onClick={() => {
                 setSelectedAge(selectedAge === age ? "" : age);
                 setSearchQuery("");
-                setProjectIndex(0);
               }}
               className={`border-2 border-primary-pink px-10 py-2 rounded-lg font-medium transition-colors ${
                 selectedAge === age
@@ -216,7 +311,6 @@ export default function LittleKoders() {
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setSelectedAge("");
-                setProjectIndex(0);
               }}
               className={`
                 border-2 rounded-lg px-4 py-2 text-base outline-none w-32 md:w-130 transition-colors ${
@@ -244,9 +338,9 @@ export default function LittleKoders() {
         </div>
 
         {currentProject ? (
-          <div className="bg-white rounded-[40px] max-w-4xl mx-auto shadow-2xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
+          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
             <div className="md:w-1/2 relative group shrink-0">
-              <div className="rounded-3xl w-full h-80 bg-gray-200 overflow-hidden">
+              <div className="rounded-lg w-full h-80 bg-gray-200 overflow-hidden">
                 <img
                   src={currentProject.media_url}
                   alt={currentProject.title}
@@ -314,70 +408,6 @@ export default function LittleKoders() {
           </div>
         )}
       </section>
-
-      <dialog
-        ref={dialogRef}
-        className="hidden open:flex fixed inset-0 z-50 m-auto bg-white rounded-xl p-8 w-[90%] md:w-137.5 h-auto max-h-[90vh] md:max-h-84 flex-col gap-2 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[3px] overflow-hidden border-b-4 border-b-primary-pink"
-        onClose={closeModal}
-      >
-        {selectedCourse && (
-          <div className="relative w-full flex flex-col">
-            <button
-              className="absolute -top-2 -right-2 w-8 h-8 flex items-center justify-center rounded-full text-primary-pink border-[1.5px] border-primary-pink hover:bg-primary-pink hover:text-white transition-colors z-50"
-              onClick={closeModal}
-              aria-label="Tutup modal"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            <div className="w-full flex flex-col items-center mb-6">
-              <h2 className="text-2xl font-semibold text-primary-pink text-center mb-1">
-                {selectedCourse.name}
-              </h2>
-              <p className="text-center text-gray-600 text-xs font-medium">
-                Usia {selectedCourse.age_range} (
-                {selectedCourse.duration_per_session})
-              </p>
-            </div>
-
-            <div className="flex flex-col md:flex-row items-end gap-4">
-              <div className="flex flex-col md:flex-row items-end gap-6 w-full relative">
-                <div className="flex-1 self-stretch flex flex-col justify-start">
-                  <div className="mb-3">
-                    <span className="bg-primary-pink text-white text-[10px] tracking-wider font-medium px-3 py-1 rounded-md inline-block">
-                      Tentang Kursus
-                    </span>
-                  </div>
-                  <p className="text-xs text-black leading-relaxed text-justify flex-1">
-                    {selectedCourse.description}
-                  </p>
-                </div>
-
-                <div className="w-28 md:w-48 shrink-0 z-10 relative -mt-6 -mr-14 -mb-10 -rotate-6 translate-x-2 translate-y-2">
-                  <img
-                    src={mascotImg2}
-                    alt="maskot"
-                    className="w-full h-auto object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </dialog>
     </div>
   );
 }

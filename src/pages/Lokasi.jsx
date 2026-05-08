@@ -1,10 +1,24 @@
-import { useEffect } from "react";
 import lokasiImg from "../assets/images/lokasi-kn.jpeg";
+import LoadingScreen from "../components/LoadingScreen";
+import { useState, useEffect } from "react";
 
 export default function Lokasi() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     document.title = "Lokasi | Koding Next Samarinda";
     window.scrollTo(0, 0);
+
+    if (isLoading) return;
+
     const observerOptions = {
       threshold: 0.15,
     };
@@ -21,11 +35,15 @@ export default function Lokasi() {
     elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="py-20 overflow-hidden">
+      <section className="py-16 overflow-hidden">
         <div className="container mx-auto px-6 lg:px-24">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="lg:pl-20 reveal-left">
@@ -35,10 +53,10 @@ export default function Lokasi() {
 
               <div className="space-y-6">
                 <div className="flex gap-3 items-start">
-                  <div className="p-2 rounded-lg text-primary-pink">
+                  <div className="rounded-lg text-primary-pink">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
+                      className="h-8 w-8"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -64,10 +82,10 @@ export default function Lokasi() {
                 </div>
 
                 <div className="flex gap-3 items-start">
-                  <div className="p-2 rounded-lg text-primary-pink">
+                  <div className="rounded-lg text-primary-pink">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
+                      className="h-8 w-8"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -94,7 +112,7 @@ export default function Lokasi() {
 
               <div className="mt-10">
                 <a
-                  href="https://maps.app.goo.gl/qVdVbcFoNJ5MHscK9"
+                  href="https://maps.google.com/?q=Koding+Next+Samarinda"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block bg-primary-pink text-white font-medium px-6 py-3 rounded-lg shadow-sm hover:bg-hover-pink hover:-translate-y-1 transition-all duration-300"
@@ -119,10 +137,10 @@ export default function Lokasi() {
 
       <section className="pb-24 bg-white">
         <div className="container mx-auto px-6 lg:px-24 reveal">
-          <div className="w-full h-112.5 lg:mx-auto lg:max-w-5xl rounded-3xl shadow-2xl overflow-hidden border-8 border-white">
+          <div className="w-full h-112.5 lg:mx-auto lg:max-w-5xl rounded-3xl shadow-2xl overflow-hidden border-8 border-white bg-gray-100">
             <iframe
               title="Peta Lokasi Koding Next Samarinda"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.666674043302!2d117.15274730000003!3d-0.4995492999999985!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67ff17b9cdaf1%3A0x1b786f8e75e8bad3!2sKoding%20Next%20Samarinda!5e0!3m2!1sid!2sid!4v1775981096763!5m2!1sid!2sid" // Masukkan URL embed map di sini
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.658661603588!2d117.1504!3d-0.5019!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f0000000000%3A0x0!2zMDDCsDMwJzA2LjkiUyAxMTfCsDA5JzAxLjQiRQ!5e0!3m2!1sid!2sid!4v1700000000000"
               width="100%"
               height="100%"
               style={{ border: 0 }}
