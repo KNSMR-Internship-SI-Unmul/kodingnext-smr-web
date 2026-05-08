@@ -4,7 +4,6 @@ import mascotImg2 from "../assets/images/mascot2.png";
 import LoadingScreen from "../components/LoadingScreen";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { service } from "../services/service";
-import { studentProjects } from "../assets/data/studentProjects";
 
 export default function JuniorKoders() {
   const [courseDetail, setCourseDetail] = useState(null);
@@ -27,13 +26,14 @@ export default function JuniorKoders() {
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        const [resCourse, resModules] = await Promise.all([
+        const [resCourse, resModules, resProjects] = await Promise.all([
           service.getCourseById(COURSE_ID),
           service.getModules(COURSE_ID),
+          service.getProjects({ course_type_id: COURSE_ID }),
         ]);
         setCourseDetail(resCourse?.data || resCourse);
         setModules(resModules?.data || resModules || []);
-        setProjects(studentProjects);
+        setProjects(resProjects?.data || resProjects || []);
       } catch (error) {
         console.error("Gagal mengambil data API:", error);
       } finally {
@@ -59,7 +59,7 @@ export default function JuniorKoders() {
         if (selectedCategory === "Innovator") {
           return cat.includes("innovator");
         }
-        
+
         return true;
       })
       .toSorted((a, b) => a.id - b.id);
@@ -77,11 +77,15 @@ export default function JuniorKoders() {
   };
 
   const prevProject = () => {
-    setProjectIndex((prev) => (prev === 0 ? filteredProjects.length - 1 : prev - 1));
+    setProjectIndex((prev) =>
+      prev === 0 ? filteredProjects.length - 1 : prev - 1,
+    );
   };
 
   const nextProject = () => {
-    setProjectIndex((prev) => (prev === filteredProjects.length - 1 ? 0 : prev + 1));
+    setProjectIndex((prev) =>
+      prev === filteredProjects.length - 1 ? 0 : prev + 1,
+    );
   };
 
   const filteredProjects = useMemo(() => {
@@ -90,12 +94,15 @@ export default function JuniorKoders() {
     return projects.filter((project) => {
       // Gunakan selectedAgeProject, bukan selectedAge
       const matchesAge =
-        selectedAgeProject === "" || project.age_category === selectedAgeProject;
-      
+        selectedAgeProject === "" ||
+        project.age_category === selectedAgeProject;
+
       const matchesSearch =
-        project.student_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.title?.toLowerCase().includes(searchQuery.toLowerCase());
-        
+        project.student?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        false ||
+        project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        false;
+
       return matchesAge && matchesSearch;
     });
   }, [projects, selectedAgeProject, searchQuery]); // Update dependency
@@ -169,15 +176,19 @@ export default function JuniorKoders() {
           {/* Section Seleksi Usia & Kategori (Card Besar) */}
           <div className="flex flex-col md:flex-row justify-center gap-12 mb-12 px-24 ">
             {/* Card Junior Koders 8-12 */}
-            <div 
+            <div
               onClick={() => setSelectedAge("8-12")}
               className={`relative flex-1 max-w-lg rounded-lg p-8 cursor-pointer transition-all duration-300 shadow-xl overflow-hidden group ${
-                selectedAge === "8-12" ? "ring-4 ring-hover-blue scale-[1.02]" : "opacity-70 hover:opacity-100"
+                selectedAge === "8-12"
+                  ? "ring-4 ring-hover-blue scale-[1.02]"
+                  : "opacity-70 hover:opacity-100"
               }`}
               style={{ backgroundColor: "#51a7d3" }}
             >
               <div className="relative z-10">
-                <h3 className="text-white text-xl font-medium mb-6 text-center">Junior Koders 8-12</h3>
+                <h3 className="text-white text-xl font-medium mb-6 text-center">
+                  Junior Koders 8-12
+                </h3>
                 <div className="flex flex-col gap-3 items-start">
                   <span className="bg-white text-primary-blue px-6 py-2 rounded-md font-medium text-sm shadow-sm">
                     Game Development
@@ -187,23 +198,27 @@ export default function JuniorKoders() {
                   </span>
                 </div>
               </div>
-              <img 
-                src={mascotImg1} 
-                alt="Robot Mascot" 
+              <img
+                src={mascotImg1}
+                alt="Robot Mascot"
                 className="absolute -bottom-24 -right-6 w-48 h-72 object-contain translate-y-4 translate-x-2"
               />
             </div>
 
             {/* Card Junior Koders 13-16 */}
-            <div 
+            <div
               onClick={() => setSelectedAge("12-16")}
               className={`relative flex-1 max-w-lg rounded-lg p-8 cursor-pointer transition-all duration-300 shadow-xl overflow-hidden group ${
-                selectedAge === "12-16" ? "ring-4 ring-hover-blue scale-[1.02]" : "opacity-70 hover:opacity-100"
+                selectedAge === "12-16"
+                  ? "ring-4 ring-hover-blue scale-[1.02]"
+                  : "opacity-70 hover:opacity-100"
               }`}
               style={{ backgroundColor: "#51a7d3" }}
             >
               <div className="relative z-10">
-                <h3 className="text-white text-xl font-medium mb-6 text-center">Junior Koders 13-16</h3>
+                <h3 className="text-white text-xl font-medium mb-6 text-center">
+                  Junior Koders 13-16
+                </h3>
                 <div className="flex flex-col gap-3 items-start">
                   <span className="bg-white text-primary-blue px-6 py-2 rounded-md font-medium text-sm shadow-sm">
                     Tech Innovator
@@ -213,9 +228,9 @@ export default function JuniorKoders() {
                   </span>
                 </div>
               </div>
-              <img 
-                src={mascotImg2} 
-                alt="Cat Mascot" 
+              <img
+                src={mascotImg2}
+                alt="Cat Mascot"
                 className="absolute -bottom-10 -right-2 w-48 h-58 object-contain translate-y-4 translate-x-2"
               />
             </div>
@@ -248,10 +263,7 @@ export default function JuniorKoders() {
           <div className="space-y-12 md:-space-y-25">
             {filteredModules.length > 0 ? (
               filteredModules.map((m, index) => (
-                <div
-                  key={m.id}
-                  className="flex items-center relative min-h-48"
-                >
+                <div key={m.id} className="flex items-center relative min-h-48">
                   <div className="w-full md:w-[calc(50%-20px)] flex justify-end pr-2 md:pr-8">
                     {index % 2 === 0 && (
                       <Card
@@ -387,7 +399,7 @@ export default function JuniorKoders() {
         </div>
 
         {currentProject ? (
-          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-2xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
+          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
             <div className="md:w-1/2 relative group shrink-0">
               <div className="rounded-lg w-full h-80 bg-gray-200 overflow-hidden">
                 <img
@@ -402,11 +414,16 @@ export default function JuniorKoders() {
             </div>
 
             <div className="md:w-1/2 flex flex-col">
-              <h3 className="text-3xl font-semibold text-gray-900 mb-2 line-clamp-2">
+              <h3 className="text-3xl font-semibold text-gray-900 mb-1 line-clamp-2">
                 {currentProject.title}
               </h3>
+              <h2>
+                <span className="text-gray-600 font-medium text-sm mb-4 block">
+                  Oleh: {currentProject.student}
+                </span>
+              </h2>
               <span className="bg-primary-blue text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4">
-                {currentProject.modules}
+                {currentProject.module}
               </span>
               <p className="text-gray-600 leading-relaxed flex-1 line-clamp-5">
                 {currentProject.description}
@@ -478,7 +495,8 @@ function Card({ module, index, onClick, side }) {
           {module.name}
         </h3>
         <p className="text-xs font-medium text-gray-800">
-          Usia: {module.age_range} Tahun ({module.duration_per_session} Menit/Sesi)
+          Usia: {module.age_range} Tahun ({module.duration_per_session}{" "}
+          Menit/Sesi)
         </p>
       </div>
     </button>

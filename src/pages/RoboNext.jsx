@@ -3,7 +3,6 @@ import mascotImg1 from "../assets/images/mascot1.png";
 import LoadingScreen from "../components/LoadingScreen";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { service } from "../services/service";
-import { studentProjects } from "../assets/data/studentProjects";
 
 export default function RoboNext() {
   const [courseDetail, setCourseDetail] = useState(null);
@@ -24,13 +23,14 @@ export default function RoboNext() {
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        const [resCourse, resModules] = await Promise.all([
+        const [resCourse, resModules, resProjects] = await Promise.all([
           service.getCourseById(COURSE_ID),
           service.getModules(COURSE_ID),
+          service.getProjects({ course_type_id: COURSE_ID }),
         ]);
         setCourseDetail(resCourse?.data || resCourse);
         setModules(resModules?.data || resModules || []);
-        setProjects(studentProjects);
+        setProjects(resProjects?.data || resProjects || []);
       } catch (error) {
         console.error("Gagal mengambil data API:", error);
       } finally {
@@ -71,7 +71,7 @@ export default function RoboNext() {
       const matchesAge =
         selectedAge === "" || project.age_category === selectedAge;
       const matchesSearch =
-        project.student_name
+        project.student
           ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
         false ||
@@ -143,7 +143,14 @@ export default function RoboNext() {
                 Lihat Modul
               </button>
 
-              <button className="bg-white border-[1.5px] border-primary-purple text-primary-purple px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-purple hover:border-hover-purple hover:text-white transition-colors">
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("project-section")
+                    .scrollIntoView({ behavior: "smooth" })
+                }
+                className="bg-white border-[1.5px] border-primary-purple text-primary-purple px-4 py-2 rounded-lg text-sm font-medium hover:bg-hover-purple hover:border-hover-purple hover:text-white transition-colors"
+              >
                 Lihat Proyek
               </button>
             </div>
@@ -312,7 +319,7 @@ export default function RoboNext() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Cari Nama Siswa..."
+              placeholder="Cari judul atau nama siswa..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -359,11 +366,16 @@ export default function RoboNext() {
             </div>
 
             <div className="md:w-1/2 flex flex-col">
-              <h3 className="text-3xl font-semibold text-gray-900 mb-2 line-clamp-2">
+              <h3 className="text-3xl font-semibold text-gray-900 mb-1 line-clamp-2">
                 {currentProject.title}
               </h3>
+              <h2>
+                <span className="text-gray-600 font-medium text-sm mb-4 block">
+                  Oleh: {currentProject.student}
+                </span>
+              </h2>
               <span className="bg-primary-purple text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4">
-                {currentProject.modules}
+                {currentProject.module}
               </span>
               <p className="text-gray-600 leading-relaxed flex-1 line-clamp-5">
                 {currentProject.description}
