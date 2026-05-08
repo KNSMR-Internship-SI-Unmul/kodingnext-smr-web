@@ -1,19 +1,47 @@
 import heroImg from "../assets/images/hero-image.png";
 import logoImg from "../assets/images/logo-knsmr.png";
+import LoadingScreen from "../components/LoadingScreen";
 
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { courseTypes } from "../assets/data/courseTypes";
-import { promotions } from "../assets/data/promotions";
-import { events } from "../assets/data/events";
+import { service } from "../services/service";
 import { reviews } from "../assets/data/reviews";
 
 export default function Home() {
   const promoRef = useRef(null);
   const eventRef = useRef(null);
   const scrollRef = useRef(null);
+
+  const [promotions, setPromotions] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [courseTypes, setCourseTypes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [scrollProgress, setScrollProgress] = useState(0);
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  useEffect(() => {
+    const loadHomeData = async () => {
+      try {
+        setIsLoading(true);
+        const [promoRes, eventRes, courseRes] = await Promise.all([
+          service.getPromotions(),
+          service.getEvents(),
+          service.getCourses(),
+        ]);
+
+        setPromotions(promoRes?.data || []);
+        setEvents(eventRes?.data || []);
+        setCourseTypes(courseRes?.data || []);
+      } catch (error) {
+        console.error("Gagal memuat data beranda:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHomeData();
+  }, []);
 
   const handleScroll = () => {
     if (scrollRef.current) {
@@ -47,48 +75,58 @@ export default function Home() {
     });
   };
 
-  useEffect(() => {
-    document.title = "Beranda | Koding Next Samarinda";
-    window.scrollTo(0, 0);
+  const [expandedPromos, setExpandedPromos] = useState({});
 
-    const observerOptions = { threshold: 0.15 };
+  const toggleExpand = (id) => {
+    setExpandedPromos((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("active");
-        }
-      });
-    }, observerOptions);
-
-    const elements = document.querySelectorAll('[class*="reveal"]');
-    elements.forEach((el) => observer.observe(el));
-
-    const currentRef = scrollRef.current;
+  const currentRef = scrollRef.current;
     if (currentRef) {
       currentRef.addEventListener("scroll", handleScroll);
     }
 
-    return () => {
-      observer.disconnect();
-      if (currentRef) {
-        currentRef.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, []);
+  useEffect(() => {
+    document.title = "Beranda | Koding Next Samarinda";
+    window.scrollTo(0, 0);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add("active");
+        });
+      },
+      { threshold: 0.15 },
+    );
+
+    const elements = document.querySelectorAll('[class*="reveal"]');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [isLoading]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div>
-      <section className="container mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center gap-6 overflow-hidden">
+      <section className="container mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center overflow-hidden">
         <div className="lg:w-1/2 text-center lg:text-left reveal lg:pl-20">
-          <h1 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-gray-900 text-shadow-xs">
+          <h1 className="text-4xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-900">
             Koding Next <br />
-            <span className="text-primary-pink">Samarinda</span>
+            <span className="text-4xl lg:text-[60px] leading-tight tracking-tight text-primary-pink">
+              Samarinda
+            </span>
           </h1>
 
-          <p className="mt-4 text-gray-600 text-lg max-w-md mx-auto lg:mx-0 leading-relaxed">
+          <p className="mt-4 text-black text-base text-justify max-w-md mx-auto lg:mx-0 leading-tight">
             Bantu anak Anda menjadi Future Coders yang siap menghadapi dunia
-            teknologi dengan program belajar di Koding Next Samarinda.
+            teknologi dengan program belajar coding, game development, dan
+            robotika di Koding Next Samarinda.
           </p>
 
           <a
@@ -109,9 +147,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-6 lg:px-45">
-          <div className="bg-secondary-pink rounded-xl shadow-lg border-b-6 border-primary-pink p-10 lg:p-16">
+          <div className="bg-secondary-pink/30 rounded-xl shadow-lg border-b-3 border-primary-pink p-10 lg:p-16">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
               <div className="w-full lg:w-1/3 flex justify-center reveal-left">
                 <div className="relative">
@@ -124,15 +162,18 @@ export default function Home() {
               </div>
 
               <div className="w-full lg:w-2/3 text-center lg:text-left reveal-right">
-                <p className="text-gray-700 text-lg leading-relaxed font-sans max-w-2xl">
-                  Misi kami memberdayakan generasi inovator teknologi berikutnya
-                  melalui kurikulum coding yang mengasah kreativitas dan
-                  keterampilan pemecahan masalah.
+                <p className="text-black text-md leading-relaxed font-sans max-w-2xl text-justify">
+                  Misi kami adalah memberdayakan generasi inovator teknologi
+                  masa depan melalui kurikulum coding kelas dunia yang
+                  menginspirasi kreativitas dan kemampuan pemecahan masalah.
+                  Hadir secara resmi di Samarinda sejak 2023, kami berkomitmen
+                  membawa standar pendidikan teknologi terbaik untuk mendukung
+                  pertumbuhan talenta lokal di Kalimantan Timur.
                 </p>
 
                 <a
                   href="/tentangkami"
-                  className="mt-8 inline-block border-2 border-primary-pink text-primary-pink hover:bg-hover-pink hover:text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 shadow-sm"
+                  className="mt-8 inline-block border-2 border-primary-pink text-primary-pink hover:bg-hover-pink hover:border-hover-pink hover:text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 shadow-sm"
                 >
                   Lihat Selengkapnya
                 </a>
@@ -142,126 +183,250 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-18 bg-white overflow-hidden">
+      <section className="py-12 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-24">
           <div className="text-center reveal">
-            <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900">
+            <h1 className="text-3xl lg:text-4xl font-bold text-black">
               Kursus <span className="text-primary-pink">Kami</span>
             </h1>
-            <p className="mt-6 text-gray-600 max-w-4xl mx-auto text-medium leading-relaxed">
+            <p className="mt-6 text-black max-w-4xl mx-auto text-base leading-relaxed">
               Kami menawarkan kurikulum komprehensif yang dikembangkan oleh tim
               internasional, guru-guru yang berpengalaman, dan fokus pada
-              pembelajaran individual dan berbasis proyek. Anak-anak dapat
-              mengeksplorasi coding dan teknologi dengan cara yang menyenangkan
-              dan menarik.
+              pembelajaran individual dan berbasis proyek. Di Koding Next,
+              anak-anak dapat mengeksplorasi coding dan teknologi dengan cara
+              yang menyenangkan dan menarik.
             </p>
           </div>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:px-24">
-            {courseTypes.map((course, index) => (
-              <Link
-                key={course.id}
-                to={`/kursus/${course.id}`}
-                className="group block reveal"
-                style={{ transitionDelay: `${index * 0.15}s` }}
-              >
-                <div className="mx-auto max-w-sm overflow-hidden rounded-2xl shadow-md bg-white border border-gray-100 transition-all duration-500 group-hover:shadow-xl group-hover:-translate-y-2">
-                  <div className="aspect-video lg:aspect-4/4 overflow-hidden">
-                    <img
-                      src={course.image}
-                      className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                      alt={course.name}
-                    />
-                  </div>
+            {courseTypes.length > 0 ? (
+              courseTypes.map((course, index) => (
+                <Link
+                  key={course.id}
+                  to={`/kursus/${course.name.toLowerCase().replaceAll(/\s+/g, "-")}`}
+                  className="group block reveal"
+                  style={{ transitionDelay: `${index * 0.15}s` }}
+                >
+                  <div className="mx-auto max-w-sm overflow-hidden rounded-2xl shadow-md bg-white border border-gray-100 transition-all duration-500 group-hover:shadow-xl group-hover:-translate-y-2">
+                    <div className="aspect-video lg:aspect-square overflow-hidden">
+                      <img
+                        src={course.image_url}
+                        className="w-full h-full"
+                        alt={course.name}
+                      />
+                    </div>
 
-                  <div className="p-5">
-                    <p className="text-medium font-bold text-gray-800 leading-tight">
-                      {course.name}
-                    </p>
-                    <div className="mt-2 flex items-center text-sm text-gray-600 transition-colors duration-300 group-hover:text-hover-pink font-semibold">
-                      Detail Program <span className="ml-1">→</span>
+                    <div className="p-5">
+                      <p className="text-base font-bold text-gray-800 leading-tight">
+                        {course.name}
+                      </p>
+                      <div className="mt-1 flex items-center text-sm text-gray-600 transition-colors duration-300 group-hover:text-hover-pink font-medium">
+                        Detail Program <span className="ml-1">→</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-10">
+                <p className="text-gray-400">Belum ada kursus yang tersedia.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      <section className="py-8 bg-white overflow-hidden">
+      <section className="py-12 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-32">
-          <div className="mb-8 text-center lg:text-center reveal">
-            <h2 className="text-3xl lg:text-3xl font-bold text-gray-900">
+          <div className="mb-4 text-center reveal">
+            <h2 className="text-2xl lg:text-3xl font-bold text-black tracking-tight">
               Jangan lewatkan{" "}
-              <span className="text-primary-pink">penawaran spesial</span> dari
+              <span className="text-primary-pink">promo spesial</span> dari
               kami!
             </h2>
           </div>
 
-          <div className="relative group lg:px-24">
-            <button
-              onClick={() => scrollPromo(-1)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary-pink hover:bg-hover-pink text-white w-12 h-12 rounded-full z-10 flex items-center justify-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="size-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-
-            <div
-              ref={promoRef}
-              className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory py-4"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {promotions.map((promo) => (
-                <div
-                  key={promo.id}
-                  className="w-[85%] md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0 snap-start"
+          {Array.isArray(promotions) && promotions.length > 0 ? (
+            <div className="relative lg:px-20">
+              {promotions.length > 1 && (
+                <button
+                  onClick={() => scrollPromo(-1)}
+                  className="absolute left-10 top-1/2 -translate-y-1/2 bg-primary-pink text-white hover:bg-hover-pink w-11 h-11 rounded-full z-10 flex items-center justify-center shadow-lg transition-all"
                 >
-                  <img
-                    src={promo.image}
-                    className="w-full h-full aspect-3/4 object-cover rounded-2xl shadow-md border border-gray-100 hover:-translate-y-2 transition-all duration-300"
-                    alt="Promo Koding Next"
-                  />
-                </div>
-              ))}
-            </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              )}
 
-            <button
-              onClick={() => scrollPromo(1)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary-pink hover:bg-hover-pink text-white w-12 h-12 rounded-full z-10 flex items-center justify-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="size-6"
+              <div
+                ref={promoRef}
+                className="flex overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
+                {promotions.map((promo) => (
+                  <div
+                    key={promo.id}
+                    className="w-full shrink-0 snap-start px-4"
+                  >
+                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-start gap-8 bg-gray-50/50 rounded-3xl p-6 lg:p-8 transition-all duration-300">
+                      <div className="w-full lg:w-[35%] shrink-0 lg:sticky lg:top-0">
+                        <div className="aspect-4/5 w-full max-w-[320px] mx-auto overflow-hidden rounded-2xl shadow-md border border-gray-100 bg-white">
+                          <img
+                            src={promo.image_url}
+                            alt={promo.title}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="w-full lg:w-[65%] flex flex-col">
+                        <span className="text-primary-pink font-bold text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
+                          <span className="w-8 h-0.5 bg-primary-pink"></span>{" "}
+                          Penawaran Terbatas
+                        </span>
+
+                        <h3 className="text-xl lg:text-2xl font-extrabold text-gray-900 mb-4 leading-tight">
+                          {promo.title}
+                        </h3>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 mb-8">
+                          <div className="flex items-center gap-3 bg-white">
+                            <div className="bg-primary-pink/10 p-2 rounded-lg">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-primary-pink"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-gray-800 uppercase font-bold">
+                                Mulai
+                              </span>
+                              <span className="text-sm font-semibold text-gray-700">
+                                {promo.start_date}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 bg-white">
+                            <div className="bg-primary-pink/10 p-2 rounded-lg">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-primary-pink"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-gray-800 uppercase font-bold">
+                                Berakhir
+                              </span>
+                              <span className="text-sm font-semibold text-gray-700">
+                                {promo.end_date}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-black text-sm lg:text-base text-justify leading-relaxed">
+                          <p className="transition-all duration-300">
+                            {expandedPromos[promo.id]
+                              ? promo.description
+                              : `${promo.description?.slice(0, 200)}${promo.description?.length > 200 ? "..." : ""}`}
+                          </p>
+
+                          {promo.description?.length > 200 && (
+                            <button
+                              onClick={() => toggleExpand(promo.id)}
+                              className="mt-4 text-primary-pink text-sm font-bold hover:underline w-fit flex items-center gap-1"
+                            >
+                              {expandedPromos[promo.id]
+                                ? "Lebih sedikit"
+                                : "Selengkapnya"}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className={`h-4 w-4 transition-transform ${expandedPromos[promo.id] ? "rotate-180" : ""}`}
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 9l-7 7-7-7"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {promotions.length > 1 && (
+                <button
+                  onClick={() => scrollPromo(1)}
+                  className="absolute right-10 top-1/2 -translate-y-1/2 bg-primary-pink text-white hover:bg-hover-pink w-11 h-11 rounded-full z-10 flex items-center justify-center shadow-lg transition-all"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="w-full py-16 text-center">
+              <p className="text-gray-400 font-medium">
+                Belum ada promosi aktif.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
       <section className="py-16 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-42">
           <div className="text-center mb-4 reveal">
-            <h2 className="text-4xl font-extrabold text-gray-900">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
               Apa <span className="text-primary-pink">Kata Mereka</span>
             </h2>
           </div>
@@ -356,11 +521,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-white overflow-hidden">
+      <section className="py-16 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-16">
-          <div className="flex justify-between items-end mb-12 lg:pl-20 lg:pr-32">
+          <div className="flex justify-between items-end mb-6 lg:pl-20 lg:pr-32">
             <div>
-              <h2 className="px-8 text-4xl font-extrabold text-gray-900 leading-tight">
+              <h2 className="px-8 text-4xl font-bold text-gray-900 leading-tight">
                 Kegiatan <span className="text-primary-pink">Kami</span>
               </h2>
             </div>
@@ -368,7 +533,7 @@ export default function Home() {
             <div className="flex gap-4">
               <button
                 onClick={() => scrollEvent(-1)}
-                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:text-white transition-colors"
+                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -386,7 +551,7 @@ export default function Home() {
 
               <button
                 onClick={() => scrollEvent(1)}
-                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:text-white transition-colors"
+                className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -420,7 +585,7 @@ export default function Home() {
               >
                 <div className="overflow-hidden">
                   <img
-                    src={event.image}
+                    src={event.image_url}
                     className="w-full h-64 lg:h-72 object-cover transition-transform duration-500 group-hover:scale-105"
                     alt={event.name}
                   />
@@ -465,7 +630,8 @@ export default function Home() {
               />
 
               <dialog
-                className="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden relative flex flex-row focus:outline-none animate-in zoom-in-95 duration-300"
+                className="bg-white w-full max-w-3xl h-100 rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row focus:outline-none animate-in zoom-in-95 duration-300"
+                open
                 aria-modal="true"
                 aria-labelledby="modal-title"
               >
@@ -490,19 +656,19 @@ export default function Home() {
                   </svg>
                 </button>
 
-                <div className="w-85 h-85 shrink-0 overflow-hidden rounded-xl m-8">
+                <div className="w-full md:w-80 h-85 items-center shrink-0 overflow-hidden rounded-xl m-4 md:m-8">
                   <img
-                    src={selectedEvent.image}
-                    alt={`Foto kegiatan ${selectedEvent.name}`}
+                    src={selectedEvent.image_url}
+                    alt={selectedEvent.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
 
-                <div className="flex-1 py-8 pr-6 flex flex-col justify-start">
-                  <div className="flex items-center gap-2 text-primary-pink mb-4">
+                <div className="flex-1 p-6 md:py-8 md:pr-8 flex flex-col justify-start min-h-0">
+                  <div className="flex items-center gap-2 text-primary-pink mb-2 shrink-0">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 shrink-0"
+                      className="h-5 w-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -521,12 +687,13 @@ export default function Home() {
 
                   <h2
                     id="modal-title"
-                    className="text-2xl font-bold text-gray-900 mb-4 leading-tight"
+                    className="text-2xl font-bold text-gray-900 mb-4 shrink-0"
                   >
                     {selectedEvent.name}
                   </h2>
 
-                  <p className="text-gray-800 text-sm leading-relaxed text-justify">
+                  {/* Hanya deskripsi yang bisa scroll */}
+                  <p className="text-gray-800 text-sm leading-relaxed text-justify overflow-y-auto flex-1 pr-2">
                     {selectedEvent.description}
                   </p>
                 </div>
@@ -536,7 +703,7 @@ export default function Home() {
           <div className="flex justify-center mt-6">
             <a
               href="/kegiatan"
-              className="border-2 border-primary-pink text-primary-pink px-6 py-3 rounded-lg font-medium hover:bg-hover-pink hover:text-white transition-all duration-300 shadow-sm"
+              className="border-2 border-primary-pink text-primary-pink px-6 py-3 rounded-lg font-medium hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-all duration-300 shadow-sm"
             >
               Lihat Selengkapnya
             </a>
@@ -544,20 +711,20 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-24 bg-linear-to-b from-transparent via-30% via-primary-pink/40 to-primary-blue/40 text-center">
+      <section className="py-24 bg-linear-to-b from-transparent via-30% via-primary-pink/30 to-primary-blue/40 text-center">
         <h2 className="text-4xl font-bold mb-4 mt-4">
           Start Your Journey as a{" "}
           <span className="text-primary-pink">Future Coder!</span>
         </h2>
 
-        <p className="mt-4 text-gray-700 max-w-xl mx-auto">
+        <p className="mt-8 text-black max-w-3xl mx-auto">
           Bergabunglah dengan Koding Next Samarinda dan bantu anak Anda
           mengembangkan kreativitas, logika, dan kemampuan teknologi sejak dini.
         </p>
 
         <a
           href="https://wa.me/6281115525959"
-          className="mt-6 inline-block bg-primary-pink text-white px-6 py-3 rounded-lg font-medium hover:bg-hover-pink transition-colors"
+          className="mt-14 inline-block bg-primary-pink text-white px-6 py-3 rounded-lg font-medium hover:bg-hover-pink transition-colors"
         >
           Hubungi Kami
         </a>
