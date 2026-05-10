@@ -87,22 +87,18 @@ export default function JuniorKoders() {
     );
   };
 
-  // Ganti useMemo filteredProjects kamu dengan ini
   const filteredProjects = useMemo(() => {
     if (!Array.isArray(projects) || modules.length === 0) return [];
 
     return projects.filter((project) => {
-      // Cari parent module untuk mendapatkan age_range-nya
       const parentModule = modules.find((m) => m.name === project.module);
       if (!parentModule) return false;
 
-      // Filter Umur Proyek
       const cleanSelectedAge = selectedAgeProject.replace(" Tahun", "");
       const matchesAge =
         selectedAgeProject === "" ||
         parentModule.age_range === cleanSelectedAge;
 
-      // Filter Search
       const query = searchQuery.toLowerCase();
       const matchesSearch =
         project.student?.toLowerCase().includes(query) ||
@@ -110,9 +106,8 @@ export default function JuniorKoders() {
 
       return matchesAge && matchesSearch;
     });
-  }, [projects, selectedAgeProject, searchQuery, modules]); // Pastikan selectedAgeProject yang dipantau
+  }, [projects, selectedAgeProject, searchQuery, modules]);
 
-  // Gunakan useEffect ini agar index reset saat filter berubah
   useEffect(() => {
     setProjectIndex(0);
   }, [selectedAgeProject, searchQuery]);
@@ -129,17 +124,38 @@ export default function JuniorKoders() {
   };
 
   useEffect(() => {
-    if (courseDetail) document.title = `${courseDetail.name} | Koding Next`;
+    if (courseDetail) {
+      document.title = `${courseDetail.name} | Koding Next Samarinda`;
+      window.scrollTo(0, 0);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
     if (dialogRef.current && selectedModule) {
       dialogRef.current.showModal();
     }
+
+    return () => {
+      observer.disconnect();
+    };
   }, [selectedModule, courseDetail]);
 
   if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen">
-      <section className="relative w-full h-120 flex items-center">
+      <section className="relative w-full h-120 flex items-center reveal">
         <img
           src={heroImg}
           className="absolute inset-0 w-full h-full object-cover"
@@ -179,12 +195,12 @@ export default function JuniorKoders() {
         </div>
       </section>
 
-      <section id="modul-section" className="py-16">
+      <section id="modul-section" className="py-16 reveal">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-10">
             Modul <span className="text-primary-blue">Kami</span>
           </h2>
-          <div className="flex flex-col md:flex-row justify-center gap-12 mb-12 px-24 ">
+          <div className="flex flex-col md:flex-row justify-center gap-12 mb-12 px-24 reveal">
             <button
               type="button"
               onClick={() => setSelectedAge("8-12")}
@@ -508,7 +524,7 @@ function Card({ module, index, onClick, side }) {
     <button
       type="button"
       onClick={onClick}
-      className="relative w-full group transition-transform hover:scale-105 text-left"
+      className="relative w-full group transition-transform hover:scale-105 text-left reveal"
     >
       <div
         className={`absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center text-white font-semibold text-3xl ${isLeft ? "md:-right-5" : "md:-left-5"}`}

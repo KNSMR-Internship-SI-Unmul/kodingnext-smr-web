@@ -100,6 +100,7 @@ export default function LittleKoders() {
   useEffect(() => {
     if (courseDetail) {
       document.title = `${courseDetail.name} | Koding Next Samarinda`;
+      window.scrollTo(0, 0);
     }
 
     const observer = new IntersectionObserver(
