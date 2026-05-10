@@ -17,7 +17,7 @@ export default function LittleKoders() {
   const COURSE_ID = 1;
   const dialogRef = useRef(null);
   const scrollPosRef = useRef(0);
-  const ageCategories = ["8-12 Tahun", "12-16 Tahun"];
+  const ageCategories = ["4-6 Tahun", "6-8 Tahun"];
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -26,8 +26,9 @@ export default function LittleKoders() {
         const [resCourse, resModules, resProjects] = await Promise.all([
           service.getCourseById(COURSE_ID),
           service.getModules(COURSE_ID),
-          service.getProjects({ course_type_id: COURSE_ID }),
+          service.getProjects(),
         ]);
+
         setCourseDetail(resCourse?.data || resCourse);
         setModules(resModules?.data || resModules || []);
         setProjects(resProjects?.data || resProjects || []);
@@ -38,21 +39,23 @@ export default function LittleKoders() {
       }
     };
     fetchAllData();
-  }, []);
+  }, [COURSE_ID]);
 
   const sortedModules = useMemo(() => {
     return [...modules].sort((a, b) => a.id - b.id);
   }, [modules]);
 
-  const prevProject = () => {
+  const nextProject = () => {
     setProjectIndex((prev) =>
-      prev === 0 ? filteredProjects.length - 1 : prev - 1,
+      filteredProjects.length > 0 ? (prev + 1) % filteredProjects.length : 0,
     );
   };
 
-  const nextProject = () => {
+  const prevProject = () => {
     setProjectIndex((prev) =>
-      prev === filteredProjects.length - 1 ? 0 : prev + 1,
+      filteredProjects.length > 0
+        ? (prev - 1 + filteredProjects.length) % filteredProjects.length
+        : 0,
     );
   };
 
@@ -68,27 +71,30 @@ export default function LittleKoders() {
   };
 
   const filteredProjects = useMemo(() => {
-    // Jika projects bukan array atau kosong, kembalikan array kosong
-    if (!Array.isArray(projects) || projects.length === 0) return [];
+    if (!Array.isArray(projects) || modules.length === 0) return [];
 
     return projects.filter((project) => {
+      const parentModule = modules.find((m) => m.name === project.module);
+
+      if (!parentModule) return false;
+
+      const cleanSelectedAge = selectedAge.replace(" Tahun", "");
       const matchesAge =
-        selectedAge === "" || project.age_category === selectedAge;
+        selectedAge === "" || parentModule.age_range === cleanSelectedAge;
+
+      const query = searchQuery.toLowerCase();
       const matchesSearch =
-        project.student?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        false ||
-        project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        false;
+        project.student?.toLowerCase().includes(query) ||
+        project.title?.toLowerCase().includes(query);
+
       return matchesAge && matchesSearch;
     });
-  }, [projects, selectedAge, searchQuery]);
+  }, [projects, selectedAge, searchQuery, modules]);
 
-  // 2. Reset index dengan aman
   useEffect(() => {
     setProjectIndex(0);
-  }, [filteredProjects.length]);
+  }, [selectedAge, searchQuery]);
 
-  // 3. Ambil project saat ini (Gunakan optional chaining)
   const currentProject = filteredProjects[projectIndex] || null;
 
   useEffect(() => {
@@ -329,7 +335,7 @@ export default function LittleKoders() {
                 }
               `}
             />
-            <div className="absolute right-3 top-2.5 text-gray-500">
+            <div className="absolute right-3 top-2.5 text-gray-500 hover:text-primary-pink transition-colors cursor-pointer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -418,7 +424,7 @@ export default function LittleKoders() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-gray-400 italic">Proyek tidak ditemukan.</p>
+            <p className="text-gray-400 italic">Belum ada proyek.</p>
           </div>
         )}
       </section>

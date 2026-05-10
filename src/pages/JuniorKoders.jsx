@@ -29,19 +29,20 @@ export default function JuniorKoders() {
         const [resCourse, resModules, resProjects] = await Promise.all([
           service.getCourseById(COURSE_ID),
           service.getModules(COURSE_ID),
-          service.getProjects({ course_type_id: COURSE_ID }),
+          service.getProjects(),
         ]);
+
         setCourseDetail(resCourse?.data || resCourse);
         setModules(resModules?.data || resModules || []);
         setProjects(resProjects?.data || resProjects || []);
       } catch (error) {
-        console.error("Gagal mengambil data API:", error);
+        console.error("Gagal mengambil data:", error);
       } finally {
         setLoading(false);
       }
     };
     fetchAllData();
-  }, []);
+  }, [COURSE_ID]);
 
   const filteredModules = useMemo(() => {
     return (modules || [])
@@ -49,10 +50,8 @@ export default function JuniorKoders() {
       .filter((m) => {
         const cat = m.category?.toLowerCase() || "";
 
-        // JIKA kategori di database kosong/null, tampilkan di mana saja (Software maupun Innovator)
         if (!cat || cat.trim() === "") return true;
 
-        // JIKA ada kategorinya, lakukan pengecekan normal
         if (selectedCategory === "Software") {
           return cat.includes("software") || cat.includes("game");
         }
@@ -67,7 +66,7 @@ export default function JuniorKoders() {
 
   const openModal = (module) => {
     scrollPosRef.current = window.scrollY;
-    setSelectedModule(module); // Mengatur modul tunggal untuk modal
+    setSelectedModule(module);
   };
 
   const closeModal = () => {
@@ -88,32 +87,46 @@ export default function JuniorKoders() {
     );
   };
 
+  // Ganti useMemo filteredProjects kamu dengan ini
   const filteredProjects = useMemo(() => {
-    if (!Array.isArray(projects) || projects.length === 0) return [];
+    if (!Array.isArray(projects) || modules.length === 0) return [];
 
     return projects.filter((project) => {
-      // Gunakan selectedAgeProject, bukan selectedAge
+      // Cari parent module untuk mendapatkan age_range-nya
+      const parentModule = modules.find((m) => m.name === project.module);
+      if (!parentModule) return false;
+
+      // Filter Umur Proyek
+      const cleanSelectedAge = selectedAgeProject.replace(" Tahun", "");
       const matchesAge =
         selectedAgeProject === "" ||
-        project.age_category === selectedAgeProject;
+        parentModule.age_range === cleanSelectedAge;
 
+      // Filter Search
+      const query = searchQuery.toLowerCase();
       const matchesSearch =
-        project.student?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        false ||
-        project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        false;
+        project.student?.toLowerCase().includes(query) ||
+        project.title?.toLowerCase().includes(query);
 
       return matchesAge && matchesSearch;
     });
-  }, [projects, selectedAgeProject, searchQuery]); // Update dependency
+  }, [projects, selectedAgeProject, searchQuery, modules]); // Pastikan selectedAgeProject yang dipantau
 
-  // 2. Reset index dengan aman
+  // Gunakan useEffect ini agar index reset saat filter berubah
   useEffect(() => {
     setProjectIndex(0);
-  }, [filteredProjects.length]);
+  }, [selectedAgeProject, searchQuery]);
 
-  // 3. Ambil project saat ini (Gunakan optional chaining)
   const currentProject = filteredProjects[projectIndex] || null;
+
+  const getCategoryLabel = (cat) => {
+    if (cat === "Software") {
+      return selectedAge === "8-12"
+        ? "Game Development"
+        : "Software Development";
+    }
+    return "Tech Innovator";
+  };
 
   useEffect(() => {
     if (courseDetail) document.title = `${courseDetail.name} | Koding Next`;
@@ -126,7 +139,6 @@ export default function JuniorKoders() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
       <section className="relative w-full h-120 flex items-center">
         <img
           src={heroImg}
@@ -167,16 +179,14 @@ export default function JuniorKoders() {
         </div>
       </section>
 
-      {/* Filter Section */}
       <section id="modul-section" className="py-16">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-10">
             Modul <span className="text-primary-blue">Kami</span>
           </h2>
-          {/* Section Seleksi Usia & Kategori (Card Besar) */}
           <div className="flex flex-col md:flex-row justify-center gap-12 mb-12 px-24 ">
-            {/* Card Junior Koders 8-12 */}
-            <div
+            <button
+              type="button"
               onClick={() => setSelectedAge("8-12")}
               className={`relative flex-1 max-w-lg rounded-lg p-8 cursor-pointer transition-all duration-300 shadow-xl overflow-hidden group ${
                 selectedAge === "8-12"
@@ -203,10 +213,10 @@ export default function JuniorKoders() {
                 alt="Robot Mascot"
                 className="absolute -bottom-24 -right-6 w-48 h-72 object-contain translate-y-4 translate-x-2"
               />
-            </div>
+            </button>
 
-            {/* Card Junior Koders 13-16 */}
-            <div
+            <button
+              type="button"
               onClick={() => setSelectedAge("12-16")}
               className={`relative flex-1 max-w-lg rounded-lg p-8 cursor-pointer transition-all duration-300 shadow-xl overflow-hidden group ${
                 selectedAge === "12-16"
@@ -217,7 +227,7 @@ export default function JuniorKoders() {
             >
               <div className="relative z-10">
                 <h3 className="text-white text-xl font-medium mb-6 text-center">
-                  Junior Koders 13-16
+                  Junior Koders 12-16
                 </h3>
                 <div className="flex flex-col gap-3 items-start">
                   <span className="bg-white text-primary-blue px-6 py-2 rounded-md font-medium text-sm shadow-sm">
@@ -233,7 +243,7 @@ export default function JuniorKoders() {
                 alt="Cat Mascot"
                 className="absolute -bottom-10 -right-2 w-48 h-58 object-contain translate-y-4 translate-x-2"
               />
-            </div>
+            </button>
           </div>
 
           <div className="flex justify-center border-b border-gray-200 max-w-4xl mx-auto mb-8">
@@ -247,17 +257,12 @@ export default function JuniorKoders() {
                     : "border-transparent text-gray-400 hover:text-gray-600"
                 }`}
               >
-                {cat === "Software"
-                  ? selectedAge === "8-12"
-                    ? "Game Development"
-                    : "Software Development"
-                  : "Tech Innovator"}
+                {getCategoryLabel(cat)}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Roadmap Zigzag */}
         <div className="relative max-w-3xl mx-auto">
           <div className="absolute left-1/2 transform -translate-x-1/2 w-1.5 bg-primary-blue h-full rounded-full hidden md:block" />
           <div className="space-y-12 md:-space-y-25">
@@ -298,43 +303,62 @@ export default function JuniorKoders() {
         </div>
       </section>
 
-      {/* Modal Dialog */}
       <dialog
         ref={dialogRef}
-        className="hidden open:flex fixed inset-0 z-50 m-auto bg-white rounded-xl p-8 w-[90%] md:w-137.5 h-auto max-h-[90vh] flex-col shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[3px] border-b-4 border-b-primary-blue overflow-hidden"
+        className="hidden open:flex fixed inset-0 z-50 m-auto bg-white rounded-xl p-8 w-[90%] md:w-137.5 h-auto max-h-[90vh] md:max-h-84 flex-col gap-2 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[3px] overflow-hidden border-b-4 border-b-primary-blue"
         onClose={closeModal}
       >
         {selectedModule && (
           <div className="relative w-full flex flex-col">
             <button
-              className="absolute -top-2 -right-2 w-8 h-8 rounded-full border border-primary-blue text-primary-blue hover:bg-primary-blue hover:text-white transition-colors"
+              className="absolute -top-2 -right-2 w-8 h-8 flex items-center justify-center rounded-full text-primary-blue border-[1.5px] border-primary-blue hover:bg-primary-blue hover:text-white transition-colors z-50"
               onClick={closeModal}
             >
-              ✕
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
             </button>
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-primary-blue">
+
+            <div className="w-full flex flex-col items-center mb-6">
+              <h2 className="text-2xl font-semibold text-primary-blue text-center mb-1">
                 {selectedModule.name}
               </h2>
-              <p className="text-gray-500 text-xs font-medium">
+              <p className="text-center text-gray-600 text-xs font-medium">
                 Usia {selectedModule.age_range} Tahun (
                 {selectedModule.duration_per_session} Menit/Sesi)
               </p>
             </div>
-            <div className="flex flex-col md:flex-row items-end gap-6">
-              <div className="flex-1">
-                <span className="bg-primary-blue text-white text-[10px] px-2 py-1 rounded mb-2 inline-block">
-                  Tentang Kursus
-                </span>
-                <p className="text-xs text-black leading-relaxed text-justify">
+
+            <div className="flex flex-col md:flex-row items-end gap-6 w-full relative">
+              <div className="flex-1 self-stretch flex flex-col justify-start">
+                <div className="mb-3">
+                  <span className="bg-primary-blue text-white text-xs tracking-wider px-3 py-2 rounded-md inline-block">
+                    Tentang Kursus
+                  </span>
+                </div>
+                <p className="text-xs font-medium text-black leading-relaxed text-justify">
                   {selectedModule.description}
                 </p>
               </div>
-              <img
-                src={mascotImg1}
-                alt="mascot"
-                className="w-32 md:w-40 -mr-10 -mb-10"
-              />
+
+              <div className="w-28 md:w-48 shrink-0 z-10 relative -mt-8 -mr-14 -mb-10 -rotate-6 translate-x-2 translate-y-2">
+                <img
+                  src={mascotImg1}
+                  alt="maskot"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -482,6 +506,7 @@ function Card({ module, index, onClick, side }) {
   const isLeft = side === "right";
   return (
     <button
+      type="button"
       onClick={onClick}
       className="relative w-full group transition-transform hover:scale-105 text-left"
     >

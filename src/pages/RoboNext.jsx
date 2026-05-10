@@ -26,30 +26,35 @@ export default function RoboNext() {
         const [resCourse, resModules, resProjects] = await Promise.all([
           service.getCourseById(COURSE_ID),
           service.getModules(COURSE_ID),
-          service.getProjects({ course_type_id: COURSE_ID }),
+          service.getProjects(),
         ]);
+
         setCourseDetail(resCourse?.data || resCourse);
         setModules(resModules?.data || resModules || []);
         setProjects(resProjects?.data || resProjects || []);
       } catch (error) {
-        console.error("Gagal mengambil data API:", error);
+        console.error("Gagal mengambil data:", error);
       } finally {
         setLoading(false);
       }
     };
     fetchAllData();
-  }, []);
+  }, [COURSE_ID]);
 
   const sortedModules = useMemo(() => {
     return [...modules].sort((a, b) => a.id - b.id);
   }, [modules]);
 
   const prevProject = () => {
-    setProjectIndex((prev) => (prev === 0 ? filteredProjects.length - 1 : prev - 1));
+    setProjectIndex((prev) =>
+      prev === 0 ? filteredProjects.length - 1 : prev - 1,
+    );
   };
 
   const nextProject = () => {
-    setProjectIndex((prev) => (prev === filteredProjects.length - 1 ? 0 : prev + 1));
+    setProjectIndex((prev) =>
+      prev === filteredProjects.length - 1 ? 0 : prev + 1,
+    );
   };
 
   const openModal = (module) => {
@@ -64,29 +69,30 @@ export default function RoboNext() {
   };
 
   const filteredProjects = useMemo(() => {
-    // Jika projects bukan array atau kosong, kembalikan array kosong
-    if (!Array.isArray(projects) || projects.length === 0) return [];
+    if (!Array.isArray(projects) || modules.length === 0) return [];
 
     return projects.filter((project) => {
+      const parentModule = modules.find((m) => m.name === project.module);
+
+      if (!parentModule) return false;
+
+      const cleanSelectedAge = selectedAge.replace(" Tahun", "");
       const matchesAge =
-        selectedAge === "" || project.age_category === selectedAge;
+        selectedAge === "" || parentModule.age_range === cleanSelectedAge;
+
+      const query = searchQuery.toLowerCase();
       const matchesSearch =
-        project.student
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        false ||
-        project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        false;
+        project.student?.toLowerCase().includes(query) ||
+        project.title?.toLowerCase().includes(query);
+
       return matchesAge && matchesSearch;
     });
-  }, [projects, selectedAge, searchQuery]);
+  }, [projects, selectedAge, searchQuery, modules]);
 
-  // 2. Reset index dengan aman
   useEffect(() => {
     setProjectIndex(0);
-  }, [filteredProjects.length]);
+  }, [selectedAge, searchQuery]);
 
-  // 3. Ambil project saat ini (Gunakan optional chaining)
   const currentProject = filteredProjects[projectIndex] || null;
 
   useEffect(() => {
@@ -116,7 +122,6 @@ export default function RoboNext() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
       <section className="relative w-full h-120 flex items-center reveal">
         <img
           src={heroImg}
@@ -158,7 +163,6 @@ export default function RoboNext() {
         </div>
       </section>
 
-      {/* Modul Section (Timeline) */}
       <section id="modul-section" className="py-16 reveal">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-14">
@@ -167,7 +171,6 @@ export default function RoboNext() {
         </div>
 
         <div className="relative max-w-3xl mx-auto">
-          {/* Garis Tengah */}
           <div className="absolute left-1/2 transform -translate-x-1/2 w-1.5 bg-primary-purple h-full rounded-full hidden md:block" />
 
           <div className="-space-y-8">
@@ -175,7 +178,6 @@ export default function RoboNext() {
               const side = index % 2 === 0 ? "left" : "right";
               return (
                 <div key={m.id} className="flex items-center relative reveal">
-                  {/* Sisi Kiri */}
                   <div className="w-[calc(50%-20px)] flex justify-end items-center pr-2">
                     {side === "left" && (
                       <button
@@ -202,7 +204,6 @@ export default function RoboNext() {
                     <div className="w-4 h-4 bg-primary-purple rounded-full" />
                   </div>
 
-                  {/* Sisi Kanan */}
                   <div className="w-[calc(50%-20px)] flex justify-start items-center pl-2">
                     {side === "right" && (
                       <button
@@ -231,7 +232,6 @@ export default function RoboNext() {
         </div>
       </section>
 
-      {/* Modal Dialog */}
       <dialog
         ref={dialogRef}
         className="hidden open:flex fixed inset-0 z-50 m-auto bg-white rounded-xl p-8 w-[90%] md:w-137.5 h-auto max-h-[90vh] md:max-h-84 flex-col gap-2 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-[3px] overflow-hidden border-b-4 border-b-primary-purple"
