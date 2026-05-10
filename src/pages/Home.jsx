@@ -5,7 +5,6 @@ import LoadingScreen from "../components/LoadingScreen";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { service } from "../services/service";
-import { reviews } from "../assets/data/reviews";
 
 export default function Home() {
   const promoRef = useRef(null);
@@ -15,6 +14,7 @@ export default function Home() {
   const [promotions, setPromotions] = useState([]);
   const [events, setEvents] = useState([]);
   const [courseTypes, setCourseTypes] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -24,15 +24,17 @@ export default function Home() {
     const loadHomeData = async () => {
       try {
         setIsLoading(true);
-        const [promoRes, eventRes, courseRes] = await Promise.all([
+        const [promoRes, eventRes, courseRes, reviewRes] = await Promise.all([
           service.getPromotions(),
           service.getEvents(),
           service.getCourses(),
+          service.getReviews(),
         ]);
 
         setPromotions(promoRes?.data || []);
         setEvents(eventRes?.data || []);
         setCourseTypes(courseRes?.data || []);
+        setReviews(reviewRes?.data || []);
       } catch (error) {
         console.error("Gagal memuat data beranda:", error);
       } finally {
@@ -75,6 +77,17 @@ export default function Home() {
     });
   };
 
+  const getPromoText = (promo, isExpanded) => {
+    const description = promo.description || "";
+    
+    if (isExpanded) return description;
+
+    const isLongText = description.length > 200;
+    const truncatedText = description.slice(0, 200);
+    
+    return isLongText ? `${truncatedText}...` : truncatedText;
+  };
+
   const [expandedPromos, setExpandedPromos] = useState({});
 
   const toggleExpand = (id) => {
@@ -85,9 +98,9 @@ export default function Home() {
   };
 
   const currentRef = scrollRef.current;
-    if (currentRef) {
-      currentRef.addEventListener("scroll", handleScroll);
-    }
+  if (currentRef) {
+    currentRef.addEventListener("scroll", handleScroll);
+  }
 
   useEffect(() => {
     document.title = "Beranda | Koding Next Samarinda";
@@ -278,7 +291,7 @@ export default function Home() {
                     key={promo.id}
                     className="w-full shrink-0 snap-start px-4"
                   >
-                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-start gap-8 bg-gray-50/50 rounded-3xl p-6 lg:p-8 transition-all duration-300">
+                    <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-start gap-8 p-6 lg:p-8 transition-all duration-300">
                       <div className="w-full lg:w-[35%] shrink-0 lg:sticky lg:top-0">
                         <div className="aspect-4/5 w-full max-w-[320px] mx-auto overflow-hidden rounded-2xl shadow-md border border-gray-100 bg-white">
                           <img
@@ -357,9 +370,7 @@ export default function Home() {
 
                         <div className="text-black text-sm lg:text-base text-justify leading-relaxed">
                           <p className="transition-all duration-300">
-                            {expandedPromos[promo.id]
-                              ? promo.description
-                              : `${promo.description?.slice(0, 200)}${promo.description?.length > 200 ? "..." : ""}`}
+                            {getPromoText(promo, expandedPromos[promo.id])}
                           </p>
 
                           {promo.description?.length > 200 && (
@@ -423,7 +434,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 bg-white overflow-hidden">
+      <section className="py-12 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-42">
           <div className="text-center mb-4 reveal">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
@@ -445,11 +456,6 @@ export default function Home() {
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex items-center gap-4 mb-5">
-                    <img
-                      src={review.image}
-                      alt={review.name}
-                      className="w-14 h-14 rounded-full object-cover border-2 border-pink-100"
-                    />
                     <div>
                       <h3 className="font-bold text-primary-pink text-lg leading-tight">
                         {review.parents_name}
@@ -521,7 +527,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 bg-white overflow-hidden">
+      <section className="py-12 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-16">
           <div className="flex justify-between items-end mb-6 lg:pl-20 lg:pr-32">
             <div>
@@ -692,7 +698,6 @@ export default function Home() {
                     {selectedEvent.name}
                   </h2>
 
-                  {/* Hanya deskripsi yang bisa scroll */}
                   <p className="text-gray-800 text-sm leading-relaxed text-justify overflow-y-auto flex-1 pr-2">
                     {selectedEvent.description}
                   </p>
