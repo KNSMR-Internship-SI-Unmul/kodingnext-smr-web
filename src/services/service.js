@@ -2,8 +2,9 @@ import { apiClient } from "./api";
 
 export const service = {
   getCourses: () => apiClient("/courses", { method: "GET" }),
-  getCourseById: (idOrSlug) => apiClient(`/courses/${idOrSlug}`, { method: "GET" }),
-  
+  getCourseById: (idOrSlug) =>
+    apiClient(`/courses/${idOrSlug}`, { method: "GET" }),
+
   getModules: (courseTypeId = null) => {
     const endpoint = courseTypeId
       ? `/modules?course_type_id=${courseTypeId}`
@@ -12,14 +13,17 @@ export const service = {
   },
 
   getProjects: (filters = {}) => {
-    const { search, module_id } = filters;
+    const { search, module_id, age_range } = filters;
     const params = new URLSearchParams();
 
     if (search) params.append("search", search);
     if (module_id) params.append("module_id", module_id);
+    if (age_range) params.append("age_range", age_range);
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/student-projects?${queryString}` : "/student-projects";
+    const endpoint = queryString
+      ? `/student-projects?${queryString}`
+      : "/student-projects";
 
     return apiClient(endpoint, { method: "GET" });
   },
