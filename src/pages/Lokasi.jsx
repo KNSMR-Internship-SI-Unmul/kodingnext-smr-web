@@ -1,6 +1,6 @@
 import lokasiImg from "../assets/images/lokasi-kn.jpeg";
 import LoadingScreen from "../components/LoadingScreen";
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
 
 export default function Lokasi() {
   const [isLoading, setIsLoading] = useState(true);

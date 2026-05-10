@@ -1,6 +1,6 @@
 import tentangHero from "../assets/images/tentang.jpeg";
 import LoadingScreen from "../components/LoadingScreen";
-import { useState, useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import { service } from "../services/service";
 
 export default function Tentang() {

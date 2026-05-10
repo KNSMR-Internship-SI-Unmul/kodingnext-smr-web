@@ -1,12 +1,12 @@
+import React from "react";
 import { useParams } from "react-router-dom";
 import LittleKoders from "./pages/LittleKoders";
 import RoboNext from "./pages/RoboNext";
 import JuniorKoders from "./pages/JuniorKoders";
 
 export default function CourseDispatcher() {
-  const { id } = useParams(); // 'id' di sini menangkap slug dari URL
+  const { id } = useParams();
 
-  // Pastikan string pembanding di bawah ini sama persis dengan hasil slug
   if (id === "little-koders") return <LittleKoders />;
   if (id === "junior-koders") return <JuniorKoders />;
   if (id === "robonext" || id === "robo-next") return <RoboNext />;

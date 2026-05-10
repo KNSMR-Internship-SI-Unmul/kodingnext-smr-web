@@ -2,7 +2,7 @@ import heroImg from "../assets/images/hero-image.png";
 import logoImg from "../assets/images/logo-knsmr.png";
 import LoadingScreen from "../components/LoadingScreen";
 
-import { useState, useRef, useEffect } from "react";
+import { React, useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { service } from "../services/service";
 
@@ -145,7 +145,7 @@ export default function Home() {
           <a
             href="https://wa.me/6281115525959"
             target="_blank"
-            className="mt-8 inline-block bg-primary-pink hover:bg-hover-pink text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all duration-300"
+            className="mt-8 inline-block bg-primary-pink hover:bg-hover-pink text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all duration-300" rel="noreferrer"
           >
             Daftar Sekarang
           </a>
