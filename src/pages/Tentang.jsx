@@ -104,19 +104,19 @@ export default function Tentang() {
                   <img
                     src={owner.image_url}
                     className="w-68 h-68 md:w-80 md:h-80 object-cover rounded-lg shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
-                    alt={owner.name}
+                    alt={owner.name || "Suryady Sujono"}
                   />
                 ) : (
-                  <div className="w-64 h-64 md:w-80 md:h-80 rounded-2xl shadow-xl bg-gray-200 flex items-center justify-center">
+                  <div className="w-68 h-68 md:w-80 md:h-80 rounded-lg shadow-xl bg-gray-200 flex flex-col items-center justify-center gap-2">
                     <span className="text-gray-400 text-sm">
                       Foto tidak tersedia
                     </span>
                   </div>
                 )}
 
-                <div className="absolute inset-0 rounded-2xl bg-linear-to-t from-primary-blue/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <div className="absolute inset-0 rounded-lg bg-linear-to-t from-primary-blue/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                   <p className="text-white text-sm font-semibold">
-                    {owner.role}
+                    {owner.role || "Owner Koding Next Samarinda"}
                   </p>
                 </div>
               </div>
@@ -124,9 +124,11 @@ export default function Tentang() {
 
             <div className="lg:pr-18 reveal-right">
               <h2 className="text-4xl font-extrabold text-black mb-2">
-                {owner.name}
+                {owner.name || "Suryady Sujono"}
               </h2>
-              <p className="text-primary-pink font-bold mb-6">{owner.role}</p>
+              <p className="text-primary-pink font-bold mb-6">
+                {owner.role || "Owner Koding Next Samarinda"}
+              </p>
               <p className="text-black text-sm text-justify leading-relaxed">
                 "Saya percaya bahwa anak-anak di Samarinda memiliki potensi yang
                 luar biasa untuk menaklukkan dunia digital. Sejak kami membuka
