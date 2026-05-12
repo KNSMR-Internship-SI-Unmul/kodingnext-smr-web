@@ -41,19 +41,25 @@ export default function RoboNext() {
     fetchAllData();
   }, [COURSE_ID]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const sortedModules = useMemo(() => {
     return [...modules].sort((a, b) => a.id - b.id);
   }, [modules]);
 
-  const prevProject = () => {
+  const nextProject = () => {
     setProjectIndex((prev) =>
-      prev === 0 ? filteredProjects.length - 1 : prev - 1,
+      filteredProjects.length > 0 ? (prev + 1) % filteredProjects.length : 0,
     );
   };
 
-  const nextProject = () => {
+  const prevProject = () => {
     setProjectIndex((prev) =>
-      prev === filteredProjects.length - 1 ? 0 : prev + 1,
+      filteredProjects.length > 0
+        ? (prev - 1 + filteredProjects.length) % filteredProjects.length
+        : 0,
     );
   };
 
@@ -98,7 +104,6 @@ export default function RoboNext() {
   useEffect(() => {
     if (courseDetail) {
       document.title = `${courseDetail.name} | Koding Next Samarinda`;
-      window.scrollTo(0, 0);
     }
 
     const observer = new IntersectionObserver(
@@ -132,7 +137,7 @@ export default function RoboNext() {
         <div className="relative max-w-6xl mx-auto px-6 lg:px-16 w-full flex justify-end">
           <div className="relative p-8 rounded-xl max-w-md bg-white/60 backdrop-blur-sm border border-white/20 shadow-2xl">
             <h2 className="text-6xl font-bold text-primary-purple mb-4">
-              {courseDetail?.name || "Little Koders"}
+              {courseDetail?.name}
             </h2>
             <p className="text-black font-medium text-sm leading-relaxed mb-6">
               {courseDetail?.description}
@@ -322,23 +327,35 @@ export default function RoboNext() {
               type="text"
               placeholder="Cari judul atau nama siswa..."
               value={searchQuery}
+              onFocus={() => setSelectedAge("")}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setSelectedAge("");
               }}
               className={`
-                border-2 rounded-lg px-4 py-2 text-base outline-none w-32 md:w-100 transition-colors ${
+                peer border-2 rounded-lg px-4 py-2 pr-10 text-base outline-none w-32 md:w-100 transition-all
+                ${
                   searchQuery === ""
-                    ? "border-primary-purple"
-                    : "border-gray-300 focus:border-primary-purple"
+                    ? "border-gray-300 focus:border-primary-purple"
+                    : "border-primary-purple"
                 }
               `}
             />
-            <div className="absolute right-3 top-2.5 text-gray-500">
+            <div
+              className={`s
+                absolute right-2 top-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none flex items-center justify-center rounded-full text-white p-1
+                ${
+                  searchQuery === ""
+                    ? " bg-gray-300 peer-focus:bg-primary-purple"
+                    : " bg-primary-purple"
+                }
+              `}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
+                // Ukuran diperkecil ke size-5 atau size-6 agar proporsional di dalam input
                 className="size-5"
               >
                 <path
@@ -352,40 +369,50 @@ export default function RoboNext() {
         </div>
 
         {currentProject ? (
-          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
+          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 h-auto md:h-90">
             <div className="md:w-1/2 relative group shrink-0">
               <div className="rounded-lg w-full h-80 bg-gray-200 overflow-hidden">
-                <img
-                  src={currentProject.media_url}
-                  alt={currentProject.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                {currentProject.media_url.match(/\.(mp4|webm)$/i) ? (
+                  <video
+                    src={currentProject.media_url}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={currentProject.media_url}
+                    alt={currentProject.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                )}
               </div>
-              {currentProject.media_type !== "gif" && (
-                <div className="absolute inset-0 flex items-center justify-center"></div>
-              )}
             </div>
 
-            <div className="md:w-1/2 flex flex-col">
+            <div className="md:w-1/2 flex flex-col h-full overflow-hidden">
               <h3 className="text-3xl font-semibold text-gray-900 mb-1 line-clamp-2">
                 {currentProject.title}
               </h3>
-              <h2>
-                <span className="text-gray-600 font-medium text-sm mb-4 block">
-                  Oleh: {currentProject.student}
-                </span>
-              </h2>
-              <span className="bg-primary-purple text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4">
+              <span className="text-gray-600 font-medium text-sm mb-4 block">
+                Oleh: {currentProject.student}
+              </span>
+
+              <span className="bg-primary-purple text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4 shrink-0">
                 {currentProject.module}
               </span>
-              <p className="text-gray-600 leading-relaxed flex-1 line-clamp-5">
-                {currentProject.description}
-              </p>
-              <div className="flex gap-4 mt-auto pt-4 pb-4 pr-4 border-t border-gray-100 justify-end">
+
+              <div className="flex-1 overflow-hidden mb-2 hide-scrollbar">
+                <div className="h-full pr-4 overflow-y-auto text-justify text-gray-600 leading-relaxed custom-scrollbar">
+                  {currentProject.description}
+                </div>
+              </div>
+
+              <div className="flex gap-4 mt-auto pt-4 border-t border-gray-100 justify-end shrink-0">
                 <button
                   onClick={prevProject}
                   className="w-10 h-10 rounded-full border-2 border-primary-purple text-primary-purple flex items-center justify-center hover:bg-primary-purple hover:text-white transition-colors"
-                  aria-label="Sebelumnya"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -403,7 +430,6 @@ export default function RoboNext() {
                 <button
                   onClick={nextProject}
                   className="w-10 h-10 rounded-full border-2 border-primary-purple text-primary-purple flex items-center justify-center hover:bg-primary-purple hover:text-white transition-colors"
-                  aria-label="Berikutnya"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -422,8 +448,8 @@ export default function RoboNext() {
             </div>
           </div>
         ) : (
-          <div className="text-center py-20">
-            <p className="text-gray-400 italic">Proyek tidak ditemukan.</p>
+          <div className="text-center py-42">
+            <p className="text-lg text-gray-400 italic">Belum ada proyek.</p>
           </div>
         )}
       </section>

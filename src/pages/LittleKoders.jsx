@@ -41,6 +41,10 @@ export default function LittleKoders() {
     fetchAllData();
   }, [COURSE_ID]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const sortedModules = useMemo(() => {
     return [...modules].sort((a, b) => a.id - b.id);
   }, [modules]);
@@ -100,7 +104,6 @@ export default function LittleKoders() {
   useEffect(() => {
     if (courseDetail) {
       document.title = `${courseDetail.name} | Koding Next Samarinda`;
-      window.scrollTo(0, 0);
     }
 
     const observer = new IntersectionObserver(
@@ -187,7 +190,7 @@ export default function LittleKoders() {
                         className="relative inline-block text-left w-full group"
                         onClick={() => openModal(m)}
                       >
-                        <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full flex items-center justify-center text-white font-semibold text-3xl">
+                        <div className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full flex items-center justify-center text-white font-semibold text-3xl transition-all group-hover:scale-105 group-hover:border-primary-pink">
                           {index + 1}
                         </div>
                         <div className="bg-white p-8 h-30 rounded-2xl shadow-xl border-2 border-gray-200 border-b-4 border-b-primary-pink flex flex-col items-center justify-center text-center transition-all group-hover:scale-105 group-hover:border-primary-pink">
@@ -222,7 +225,7 @@ export default function LittleKoders() {
                             Menit/Sesi)
                           </p>
                         </div>
-                        <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full flex items-center justify-center text-white font-semibold text-3xl">
+                        <div className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-pink rounded-full flex items-center justify-center text-white font-semibold text-3xl transition-all group-hover:scale-105 group-hover:border-primary-pink">
                           {index + 1}
                         </div>
                       </button>
@@ -324,23 +327,35 @@ export default function LittleKoders() {
               type="text"
               placeholder="Cari judul atau nama siswa..."
               value={searchQuery}
+              onFocus={() => setSelectedAge("")}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setSelectedAge("");
               }}
               className={`
-                border-2 rounded-lg px-4 py-2 text-base outline-none w-32 md:w-130 transition-colors ${
+                peer border-2 rounded-lg px-4 py-2 pr-10 text-base outline-none w-32 md:w-130 transition-all
+                ${
                   searchQuery === ""
-                    ? "border-primary-pink"
-                    : "border-gray-300 focus:border-primary-pink"
+                    ? "border-gray-300 focus:border-primary-pink"
+                    : "border-primary-pink"
                 }
               `}
             />
-            <div className="absolute right-3 top-2.5 text-gray-500 hover:text-primary-pink transition-colors cursor-pointer">
+            <div
+              className={`s
+                absolute right-2 top-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none flex items-center justify-center rounded-full text-white p-1
+                ${
+                  searchQuery === ""
+                    ? " bg-gray-300 peer-focus:bg-primary-pink"
+                    : " bg-primary-pink"
+                }
+              `}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
+                // Ukuran diperkecil ke size-5 atau size-6 agar proporsional di dalam input
                 className="size-5"
               >
                 <path
@@ -354,40 +369,51 @@ export default function LittleKoders() {
         </div>
 
         {currentProject ? (
-          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
+          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 h-auto md:h-90">
             <div className="md:w-1/2 relative group shrink-0">
               <div className="rounded-lg w-full h-80 bg-gray-200 overflow-hidden">
-                <img
-                  src={currentProject.media_url}
-                  alt={currentProject.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                {currentProject.media_url.match(/\.(mp4|webm)$/i) ? (
+                  <video
+                    src={currentProject.media_url}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={currentProject.media_url}
+                    alt={currentProject.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                )}
               </div>
-              {currentProject.media_type !== "gif" && (
-                <div className="absolute inset-0 flex items-center justify-center"></div>
-              )}
             </div>
 
-            <div className="md:w-1/2 flex flex-col">
+            <div className="md:w-1/2 flex flex-col h-full overflow-hidden">
               <h3 className="text-3xl font-semibold text-gray-900 mb-1 line-clamp-2">
                 {currentProject.title}
               </h3>
-              <h2>
-                <span className="text-gray-600 font-medium text-sm mb-4 block">
-                  Oleh: {currentProject.student}
-                </span>
-              </h2>
-              <span className="bg-primary-pink text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4">
+
+              <span className="text-gray-600 font-medium text-sm mb-4 block">
+                Oleh: {currentProject.student}
+              </span>
+
+              <span className="bg-primary-pink text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4 shrink-0">
                 {currentProject.module}
               </span>
-              <p className="text-gray-600 leading-relaxed flex-1 line-clamp-5">
-                {currentProject.description}
-              </p>
-              <div className="flex gap-4 mt-auto pt-4 pb-4 pr-4 border-t border-gray-100 justify-end">
+
+              <div className="flex-1 overflow-hidden mb-2 hide-scrollbar">
+                <div className="h-full pr-4 overflow-y-auto text-justify text-gray-600 leading-relaxed custom-scrollbar">
+                  {currentProject.description}
+                </div>
+              </div>
+
+              <div className="flex gap-4 mt-auto pt-4 border-t border-gray-100 justify-end shrink-0">
                 <button
                   onClick={prevProject}
                   className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-primary-pink hover:text-white transition-colors"
-                  aria-label="Sebelumnya"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -405,7 +431,6 @@ export default function LittleKoders() {
                 <button
                   onClick={nextProject}
                   className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-primary-pink hover:text-white transition-colors"
-                  aria-label="Berikutnya"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -424,8 +449,8 @@ export default function LittleKoders() {
             </div>
           </div>
         ) : (
-          <div className="text-center py-20">
-            <p className="text-gray-400 italic">Belum ada proyek.</p>
+          <div className="text-center py-42">
+            <p className="text-lg text-gray-400 italic">Belum ada proyek.</p>
           </div>
         )}
       </section>
