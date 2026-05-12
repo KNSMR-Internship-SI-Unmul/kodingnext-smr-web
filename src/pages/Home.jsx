@@ -79,12 +79,12 @@ export default function Home() {
 
   const getPromoText = (promo, isExpanded) => {
     const description = promo.description || "";
-    
+
     if (isExpanded) return description;
 
     const isLongText = description.length > 200;
     const truncatedText = description.slice(0, 200);
-    
+
     return isLongText ? `${truncatedText}...` : truncatedText;
   };
 
@@ -127,7 +127,7 @@ export default function Home() {
 
   return (
     <div>
-      <section className="container mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center overflow-hidden">
+      <section className="mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center overflow-hidden">
         <div className="lg:w-1/2 text-center lg:text-left reveal lg:pl-20">
           <h1 className="text-4xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-900">
             Koding Next <br />
@@ -145,7 +145,8 @@ export default function Home() {
           <a
             href="https://wa.me/6281115525959"
             target="_blank"
-            className="mt-8 inline-block bg-primary-pink hover:bg-hover-pink text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all duration-300" rel="noreferrer"
+            className="mt-8 inline-block bg-primary-pink hover:bg-hover-pink text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all duration-300"
+            rel="noreferrer"
           >
             Daftar Sekarang
           </a>
@@ -636,7 +637,7 @@ export default function Home() {
               />
 
               <dialog
-                className="bg-white w-full max-w-3xl h-100 rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row focus:outline-none animate-in zoom-in-95 duration-300"
+                className="bg-white w-full max-w-3xl h-90 rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row focus:outline-none animate-in zoom-in-95 duration-300"
                 open
                 aria-modal="true"
                 aria-labelledby="modal-title"
@@ -662,7 +663,7 @@ export default function Home() {
                   </svg>
                 </button>
 
-                <div className="w-full md:w-80 h-85 items-center shrink-0 overflow-hidden rounded-xl m-4 md:m-8">
+                <div className="w-full md:w-95 h-75 items-center shrink-0 overflow-hidden rounded-lg m-6 mt-8">
                   <img
                     src={selectedEvent.image_url}
                     alt={selectedEvent.name}
@@ -698,7 +699,7 @@ export default function Home() {
                     {selectedEvent.name}
                   </h2>
 
-                  <p className="text-gray-800 text-sm leading-relaxed text-justify overflow-y-auto flex-1 pr-2">
+                  <p className="text-gray-800 text-sm leading-relaxed text-justify overflow-y-auto flex-1 pr-8 custom-scrollbar">
                     {selectedEvent.description}
                   </p>
                 </div>
@@ -729,7 +730,9 @@ export default function Home() {
 
         <a
           href="https://wa.me/6281115525959"
+          target="_blank"
           className="mt-14 inline-block bg-primary-pink text-white px-6 py-3 rounded-lg font-medium hover:bg-hover-pink transition-colors"
+          rel="noreferrer"
         >
           Hubungi Kami
         </a>

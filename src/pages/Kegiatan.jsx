@@ -122,7 +122,7 @@ export default function Kegiatan() {
           />
 
           <dialog
-            className="bg-white w-full max-w-3xl h-100 rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row focus:outline-none animate-in zoom-in-95 duration-300"
+            className="bg-white w-full max-w-3xl h-90 rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row focus:outline-none animate-in zoom-in-95 duration-300"
             open
             aria-modal="true"
             aria-labelledby="modal-title"
@@ -148,7 +148,7 @@ export default function Kegiatan() {
               </svg>
             </button>
 
-            <div className="w-full md:w-80 h-85 items-center shrink-0 overflow-hidden rounded-xl m-4 md:m-8">
+            <div className="w-full md:w-95 h-75 items-center shrink-0 overflow-hidden rounded-lg m-6 mt-8">
               <img
                 src={selectedEvent.image_url}
                 alt={selectedEvent.name}
@@ -184,7 +184,7 @@ export default function Kegiatan() {
                 {selectedEvent.name}
               </h2>
 
-              <p className="text-gray-800 text-sm leading-relaxed text-justify overflow-y-auto flex-1 pr-2">
+              <p className="text-gray-800 text-sm leading-relaxed text-justify overflow-y-auto flex-1 pr-8 custom-scrollbar">
                 {selectedEvent.description}
               </p>
             </div>
