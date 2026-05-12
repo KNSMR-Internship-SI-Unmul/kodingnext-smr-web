@@ -44,6 +44,10 @@ export default function JuniorKoders() {
     fetchAllData();
   }, [COURSE_ID]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const filteredModules = useMemo(() => {
     return (modules || [])
       .filter((m) => m.age_range === selectedAge)
@@ -126,8 +130,11 @@ export default function JuniorKoders() {
   useEffect(() => {
     if (courseDetail) {
       document.title = `${courseDetail.name} | Koding Next Samarinda`;
-      window.scrollTo(0, 0);
     }
+  }, [courseDetail]);
+
+  useEffect(() => {
+    if (loading) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -140,16 +147,26 @@ export default function JuniorKoders() {
       { threshold: 0.1 },
     );
 
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-
-    if (dialogRef.current && selectedModule) {
-      dialogRef.current.showModal();
-    }
+    const timeoutId = setTimeout(() => {
+      const elements = document.querySelectorAll(".reveal");
+      elements.forEach((el) => observer.observe(el));
+    }, 150);
 
     return () => {
       observer.disconnect();
+      clearTimeout(timeoutId);
     };
-  }, [selectedModule, courseDetail]);
+  }, [loading, filteredModules, filteredProjects]);
+
+  useEffect(() => {
+    if (dialogRef.current) {
+      if (selectedModule) {
+        dialogRef.current.showModal();
+      } else if (dialogRef.current.open) {
+        dialogRef.current.close();
+      }
+    }
+  }, [selectedModule]);
 
   if (loading) return <LoadingScreen />;
 
@@ -200,7 +217,7 @@ export default function JuniorKoders() {
           <h2 className="text-4xl font-bold mb-10">
             Modul <span className="text-primary-blue">Kami</span>
           </h2>
-          <div className="flex flex-col md:flex-row justify-center gap-12 mb-12 px-24 reveal">
+          <div className="flex flex-col md:flex-row justify-center gap-12 mb-12 px-24 ">
             <button
               type="button"
               onClick={() => setSelectedAge("8-12")}
@@ -284,7 +301,10 @@ export default function JuniorKoders() {
           <div className="space-y-12 md:-space-y-25">
             {filteredModules.length > 0 ? (
               filteredModules.map((m, index) => (
-                <div key={m.id} className="flex items-center relative min-h-48">
+                <div
+                  key={m.id}
+                  className="flex items-center relative min-h-48 reveal"
+                >
                   <div className="w-full md:w-[calc(50%-20px)] flex justify-end pr-2 md:pr-8">
                     {index % 2 === 0 && (
                       <Card
@@ -390,7 +410,6 @@ export default function JuniorKoders() {
             <button
               key={age}
               onClick={() => {
-                // Gunakan setSelectedAgeProject
                 setSelectedAgeProject(selectedAgeProject === age ? "" : age);
                 setSearchQuery("");
               }}
@@ -407,21 +426,32 @@ export default function JuniorKoders() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Cari Nama Siswa..."
+              placeholder="Cari judul atau nama siswa..."
               value={searchQuery}
+              onFocus={() => setSelectedAgeProject("")}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setSelectedAge("");
               }}
               className={`
-                border-2 rounded-lg px-4 py-2 text-base outline-none w-32 md:w-130 transition-colors ${
+                peer border-2 rounded-lg px-4 py-2 pr-10 text-base outline-none w-32 md:w-130 transition-all
+                ${
                   searchQuery === ""
-                    ? "border-primary-blue"
-                    : "border-gray-300 focus:border-primary-blue"
+                    ? "border-gray-300 focus:border-primary-blue"
+                    : "border-primary-blue"
                 }
               `}
             />
-            <div className="absolute right-3 top-2.5 text-gray-500">
+            <div
+              className={`s
+                absolute right-2 top-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none flex items-center justify-center rounded-full text-white p-1
+                ${
+                  searchQuery === ""
+                    ? " bg-gray-300 peer-focus:bg-primary-blue"
+                    : " bg-primary-blue"
+                }
+              `}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -439,40 +469,51 @@ export default function JuniorKoders() {
         </div>
 
         {currentProject ? (
-          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 min-h-90">
+          <div className="bg-white rounded-lg max-w-4xl mx-auto shadow-xl p-6 flex flex-col md:flex-row gap-8 border border-gray-100 h-auto md:h-90">
             <div className="md:w-1/2 relative group shrink-0">
               <div className="rounded-lg w-full h-80 bg-gray-200 overflow-hidden">
-                <img
-                  src={currentProject.media_url}
-                  alt={currentProject.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                {currentProject.media_url.match(/\.(mp4|webm)$/i) ? (
+                  <video
+                    src={currentProject.media_url}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={currentProject.media_url}
+                    alt={currentProject.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                )}
               </div>
-              {currentProject.media_type !== "gif" && (
-                <div className="absolute inset-0 flex items-center justify-center"></div>
-              )}
             </div>
 
-            <div className="md:w-1/2 flex flex-col">
+            <div className="md:w-1/2 flex flex-col h-full overflow-hidden">
               <h3 className="text-3xl font-semibold text-gray-900 mb-1 line-clamp-2">
                 {currentProject.title}
               </h3>
-              <h2>
-                <span className="text-gray-600 font-medium text-sm mb-4 block">
-                  Oleh: {currentProject.student}
-                </span>
-              </h2>
-              <span className="bg-primary-blue text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4">
+
+              <span className="text-gray-600 font-medium text-sm mb-4 block">
+                Oleh: {currentProject.student}
+              </span>
+
+              <span className="bg-primary-blue text-white text-sm font-medium px-4 py-1 rounded-lg self-start mb-4 shrink-0">
                 {currentProject.module}
               </span>
-              <p className="text-gray-600 leading-relaxed flex-1 line-clamp-5">
-                {currentProject.description}
-              </p>
-              <div className="flex gap-4 mt-auto pt-4 pb-4 pr-4 border-t border-gray-100 justify-end">
+
+              <div className="flex-1 overflow-hidden mb-2 hide-scrollbar">
+                <div className="h-full pr-4 overflow-y-auto text-justify text-gray-600 leading-relaxed custom-scrollbar">
+                  {currentProject.description}
+                </div>
+              </div>
+
+              <div className="flex gap-4 mt-auto pt-4 border-t border-gray-100 justify-end shrink-0">
                 <button
                   onClick={prevProject}
                   className="w-10 h-10 rounded-full border-2 border-primary-blue text-primary-blue flex items-center justify-center hover:bg-primary-blue hover:text-white transition-colors"
-                  aria-label="Sebelumnya"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -490,7 +531,6 @@ export default function JuniorKoders() {
                 <button
                   onClick={nextProject}
                   className="w-10 h-10 rounded-full border-2 border-primary-blue text-primary-blue flex items-center justify-center hover:bg-primary-blue hover:text-white transition-colors"
-                  aria-label="Berikutnya"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -509,8 +549,8 @@ export default function JuniorKoders() {
             </div>
           </div>
         ) : (
-          <div className="text-center py-20">
-            <p className="text-gray-400 italic">Proyek tidak ditemukan.</p>
+          <div className="text-center py-42">
+            <p className="text-lg text-gray-400 italic">Belum ada proyek.</p>
           </div>
         )}
       </section>
@@ -524,7 +564,7 @@ function Card({ module, index, onClick, side }) {
     <button
       type="button"
       onClick={onClick}
-      className="relative w-full group transition-transform hover:scale-105 text-left reveal"
+      className="relative w-full group transition-transform hover:scale-105 text-left"
     >
       <div
         className={`absolute -right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-primary-blue rounded-full flex items-center justify-center text-white font-semibold text-3xl ${isLeft ? "md:-right-5" : "md:-left-5"}`}
