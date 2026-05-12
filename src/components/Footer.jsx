@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import logoImg from "../assets/images/logo-kn.png";
 
 export default function Footer() {
@@ -7,7 +8,9 @@ export default function Footer() {
       <div className="container mx-auto px-24 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start gap-8">
           <div className="max-w-md">
-            <img src={logoImg} alt="Koding Next Logo" className="h-10 mb-4" />
+            <Link to="/">
+              <img src={logoImg} alt="Koding Next Logo" className="h-10 mb-4" />
+            </Link>
             <p className="text-sm leading-relaxed">
               Jl. Imam Bonjol No.02, Pelabuhan, Kec. Samarinda Kota,
               <br />
