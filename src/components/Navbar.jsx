@@ -16,10 +16,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white text-black shadow-md font-sans sticky top-0 z-50">
-      {/* Main Navbar Container */}
       <div className="container mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-
-        {/* 2. Logo (Tengah di Mobile, Kiri di Desktop) */}
         <div className="flex-1 md:flex-none flex px-2 justify-start">
           <Link to="/" onClick={closeMenu}>
             <img
@@ -30,7 +27,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* 1. Mobile Menu Button (Kiri) */}
         <button
           className="md:hidden p-2"
           onClick={() => setIsOpen(!isOpen)}
@@ -55,7 +51,6 @@ export default function Navbar() {
             />
           </svg>
         </button>
-        {/* 3. Desktop Navigation (Semua Elemen ke Tengah) */}
         <div className="hidden md:flex flex-1 justify-center pr-18 space-x-8 font-medium items-center">
           <Link to="/" className={isActive("/")}>
             Beranda
@@ -138,11 +133,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 4. Mobile Menu Drawer (Turun dari atas, tidak menutupi seluruh layar) */}
       <div
         className={`absolute top-full right-0 w-56 bg-white shadow-lg transition-all duration-300 ease-in-out md:hidden overflow-hidden ${isOpen ? "max-h-125 border-t" : "max-h-0"}`}
       >
-        <div className="flex flex-col py-2"> {/* Tambahkan text-right di sini agar rapi */}
+        <div className="flex flex-col py-2">
           <Link
             to="/"
             onClick={closeMenu}
