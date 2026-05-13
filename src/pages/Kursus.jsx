@@ -56,13 +56,13 @@ export default function Kursus() {
 
   return (
     <div className="min-h-screen">
-      <section className="py-14 bg-white overflow-hidden">
+      <section className="py-12 bg-white overflow-hidden">
         <div className="container mx-auto px-6 lg:px-24">
           <div className="text-center reveal">
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
+            <h1 className="text-3xl lg:text-4xl font-bold text-black">
               Kursus <span className="text-primary-pink">Kami</span>
             </h1>
-            <p className="mt-8 text-black max-w-4xl mx-auto text-base leading-relaxed">
+            <p className="mt-6 text-black max-w-4xl mx-auto text-xs lg:text-base leading-relaxed">
               Kami menawarkan kurikulum komprehensif yang dikembangkan oleh tim
               internasional, guru-guru yang berpengalaman, dan fokus pada
               pembelajaran individual dan berbasis proyek. Di Koding Next,
@@ -71,7 +71,7 @@ export default function Kursus() {
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:px-24">
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:px-24">
             {courseTypes.length > 0 ? (
               courseTypes.map((course, index) => (
                 <Link
@@ -84,7 +84,7 @@ export default function Kursus() {
                     <div className="aspect-video lg:aspect-square overflow-hidden">
                       <img
                         src={course.image_url}
-                        className="w-full h-full"
+                        className="w-full h-full object-cover" 
                         alt={course.name}
                       />
                     </div>
