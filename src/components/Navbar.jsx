@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import logoImg from "../assets/images/logo-kn.png";
 
 export default function Navbar() {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
 
   const isActive = (path) => {
     return location.pathname === path
@@ -11,14 +12,51 @@ export default function Navbar() {
       : "hover:text-hover-pink";
   };
 
+  const closeMenu = () => setIsOpen(false);
+
   return (
     <nav className="bg-white text-black shadow-md font-sans sticky top-0 z-50">
-      <div className="container mx-auto px-12 py-6 flex items-center justify-center">
-        <Link to="/" className="absolute left-6 px-12 py-8">
-          <img src={logoImg} alt="Koding Next Logo" className="h-10 w-auto" />
-        </Link>
+      {/* Main Navbar Container */}
+      <div className="container mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
 
-        <div className="space-x-8 hidden md:flex font-medium items-center">
+        {/* 2. Logo (Tengah di Mobile, Kiri di Desktop) */}
+        <div className="flex-1 md:flex-none flex px-2 justify-start">
+          <Link to="/" onClick={closeMenu}>
+            <img
+              src={logoImg}
+              alt="Koding Next Logo"
+              className="h-8 lg:h-10 w-auto"
+            />
+          </Link>
+        </div>
+
+        {/* 1. Mobile Menu Button (Kiri) */}
+        <button
+          className="md:hidden p-2"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={
+                isOpen
+                  ? "M6 18L18 6M6 6l12 12"
+                  : "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              }
+            />
+          </svg>
+        </button>
+        {/* 3. Desktop Navigation (Semua Elemen ke Tengah) */}
+        <div className="hidden md:flex flex-1 justify-center pr-18 space-x-8 font-medium items-center">
           <Link to="/" className={isActive("/")}>
             Beranda
           </Link>
@@ -44,7 +82,6 @@ export default function Navbar() {
                 />
               </svg>
             </Link>
-
             <div className="absolute left-0 top-full w-64 bg-white rounded-2xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-300">
               <div className="p-4 space-y-3">
                 <Link
@@ -92,31 +129,56 @@ export default function Navbar() {
           <Link to="/kegiatan" className={isActive("/kegiatan")}>
             Kegiatan
           </Link>
-
           <Link to="/lokasi" className={isActive("/lokasi")}>
             Lokasi
           </Link>
-
           <Link to="/tentangkami" className={isActive("/tentangkami")}>
             Tentang Kami
           </Link>
         </div>
+      </div>
 
-        {/* Mobile Menu Button */}
-        <button className="absolute right-6 md:hidden">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-6"
+      {/* 4. Mobile Menu Drawer (Turun dari atas, tidak menutupi seluruh layar) */}
+      <div
+        className={`absolute top-full right-0 w-56 bg-white shadow-lg transition-all duration-300 ease-in-out md:hidden overflow-hidden ${isOpen ? "max-h-125 border-t" : "max-h-0"}`}
+      >
+        <div className="flex flex-col py-2"> {/* Tambahkan text-right di sini agar rapi */}
+          <Link
+            to="/"
+            onClick={closeMenu}
+            className={`px-8 py-3 border-b border-gray-50 font-medium text-md ${isActive("/")}`}
           >
-            <path
-              fillRule="evenodd"
-              d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
+            Beranda
+          </Link>
+          <Link
+            to="/kursus"
+            onClick={closeMenu}
+            className={`px-8 py-3 border-b border-gray-50 font-medium text-md ${isActive("/kursus")}`}
+          >
+            Kursus
+          </Link>
+          <Link
+            to="/kegiatan"
+            onClick={closeMenu}
+            className={`px-8 py-3 border-b border-gray-50 font-medium text-md ${isActive("/kegiatan")}`}
+          >
+            Kegiatan
+          </Link>
+          <Link
+            to="/lokasi"
+            onClick={closeMenu}
+            className={`px-8 py-3 border-b border-gray-50 font-medium text-md ${isActive("/lokasi")}`}
+          >
+            Lokasi
+          </Link>
+          <Link
+            to="/tentangkami"
+            onClick={closeMenu}
+            className={`px-8 py-3 font-medium text-md ${isActive("/tentangkami")}`}
+          >
+            Tentang Kami
+          </Link>
+        </div>
       </div>
     </nav>
   );
