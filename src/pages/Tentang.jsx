@@ -65,7 +65,7 @@ export default function Tentang() {
         <div className="absolute inset-0 bg-linear-to-b from-secondary-pink/80 to-blue-200/80" />
         <div className="relative container mx-auto px-6 lg:px-24">
           <div className="lg:pl-20 reveal-left">
-            <h1 className="text-white text-shadow-lg text-6xl font-bold leading-tight">
+            <h1 className="text-white text-shadow-lg text-5xl lg:text-6xl font-bold leading-tight">
               Tentang <br /> Kami
             </h1>
           </div>
@@ -75,13 +75,13 @@ export default function Tentang() {
       <section className="py-14">
         <div className="container mx-auto px-6 lg:px-52">
           <div className="bg-secondary-blue/30 rounded-xl shadow-lg border-b-4 border-primary-blue p-10 md:p-10 lg:p-12 text-center max-w-5xl mx-auto reveal">
-            <h2 className="text-4xl font-medium text-black">
+            <h2 className="text-2xl lg:text-4xl font-medium text-black">
               Inspiring the Next Generation
             </h2>
-            <h3 className="text-4xl font-medium text-primary-pink mt-2">
+            <h3 className="text-2xl lg:text-4xl font-medium text-primary-pink mt-2">
               Through Coding
             </h3>
-            <p className="text-black mt-8 text-base font-medium max-w-3xl mx-auto text-justify">
+            <p className="text-black mt-8 text-sm lg:text-base font-medium max-w-3xl mx-auto text-justify">
               Di Koding Next Samarinda, kami percaya bahwa coding adalah bahasa
               masa depan yang harus dikuasai oleh setiap anak. Sejak membuka
               pintu kami pada tahun 2023, kami berfokus pada pengembangan
@@ -103,7 +103,7 @@ export default function Tentang() {
                 {owner.image_url ? (
                   <img
                     src={owner.image_url}
-                    className="w-68 h-68 md:w-80 md:h-80 object-cover rounded-lg shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
+                    className=" w-68 h-68 md:w-80 md:h-80 object-cover rounded-lg shadow-xl transition-transform duration-500 group-hover:scale-[1.02]"
                     alt={owner.name || "Suryady Sujono"}
                   />
                 ) : (
@@ -122,8 +122,8 @@ export default function Tentang() {
               </div>
             </div>
 
-            <div className="lg:pr-18 reveal-right">
-              <h2 className="text-4xl font-extrabold text-black mb-2">
+            <div className="px-5 lg:pr-18 reveal-right">
+              <h2 className="mt-10 lg:mt-0 text-2xl lg:text-4xl font-extrabold text-black mb-2">
                 {owner.name || "Suryady Sujono"}
               </h2>
               <p className="text-primary-pink font-bold mb-6">
@@ -145,7 +145,7 @@ export default function Tentang() {
       )}
 
       <section className="py-14">
-        <div className="container mx-auto px-6 lg:px-24">
+        <div className="container mx-auto px-12 lg:px-24">
           <div className="text-center mb-8 reveal">
             <h2 className="text-3xl font-extrabold text-gray-900">
               Tim <span className="text-primary-pink">Kami</span>

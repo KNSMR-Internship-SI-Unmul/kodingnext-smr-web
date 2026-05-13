@@ -126,17 +126,17 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <section className="mx-auto px-6 lg:px-24 py-10 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center overflow-hidden">
+    <main>
+      <section className="mx-auto px-6 py-10 lg:px-24 flex flex-col lg:flex-row bg-linear-to-br from-primary-pink/40 via-white to-primary-blue/40 items-center justify-center overflow-hidden">
         <div className="lg:w-1/2 text-center lg:text-left reveal lg:pl-20">
-          <h1 className="text-4xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-900">
+          <h1 className="text-3xl lg:text-7xl font-bold leading-tight tracking-tight text-gray-900">
             Koding Next <br />
-            <span className="text-4xl lg:text-[60px] leading-tight tracking-tight text-primary-pink">
+            <span className=" text-3xl lg:text-4xl lg:text-[60px] leading-tight tracking-tight text-primary-pink">
               Samarinda
             </span>
           </h1>
 
-          <p className="mt-4 text-black text-base text-justify max-w-md mx-auto lg:mx-0 leading-tight">
+          <p className="mt-4 text-black text-[10px] lg:text-base text-center lg:text-justify max-w-md mx-auto lg:mx-0 leading-tight">
             Bantu anak Anda menjadi Future Coders yang siap menghadapi dunia
             teknologi dengan program belajar coding, game development, dan
             robotika di Koding Next Samarinda.
@@ -145,14 +145,14 @@ export default function Home() {
           <a
             href="https://wa.me/6281115525959"
             target="_blank"
-            className="mt-8 inline-block bg-primary-pink hover:bg-hover-pink text-white font-medium px-6 py-3 rounded-lg shadow-sm transition-all duration-300"
+            className="mt-4 lg:mt-8 inline-block bg-primary-pink hover:bg-hover-pink text-white text-[10px] md:text-base font-medium px-4 py-2 lg:px-6 lg:py-3 rounded-lg shadow-sm transition-all duration-300"
             rel="noreferrer"
           >
             Daftar Sekarang
           </a>
         </div>
 
-        <div className="lg:w-1/2 flex justify-center lg:justify-end animate-float">
+        <div className="mt-10 lg:mt-0 w-2/3 lg:w-1/2 flex justify-center lg:justify-end animate-float">
           <img
             src={heroImg}
             alt="Hero"
@@ -164,19 +164,20 @@ export default function Home() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-6 lg:px-45">
           <div className="bg-secondary-pink/30 rounded-xl shadow-lg border-b-3 border-primary-pink p-10 lg:p-16">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
-              <div className="w-full lg:w-1/3 flex justify-center reveal-left">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+              <div className="w-1/3 flex justify-center reveal-left">
                 <div className="relative">
                   <img
                     src={logoImg}
-                    className="relative w-60 h-58 rounded-full object-cover shadow-2xl"
+                    className="relative w-40 h-40 lg:w-60 lg:h-60 rounded-full object-cover shadow-2xl"
                     alt="Logo"
+                    loading="lazy"
                   />
                 </div>
               </div>
 
               <div className="w-full lg:w-2/3 text-center lg:text-left reveal-right">
-                <p className="text-black text-md leading-relaxed font-sans max-w-2xl text-justify">
+                <p className="text-black text-xs lg:text-base leading-relaxed font-sans max-w-2xl text-justify">
                   Misi kami adalah memberdayakan generasi inovator teknologi
                   masa depan melalui kurikulum coding kelas dunia yang
                   menginspirasi kreativitas dan kemampuan pemecahan masalah.
@@ -187,7 +188,7 @@ export default function Home() {
 
                 <a
                   href="/tentangkami"
-                  className="mt-8 inline-block border-2 border-primary-pink text-primary-pink hover:bg-hover-pink hover:border-hover-pink hover:text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 shadow-sm"
+                  className="mt-8 inline-block border-2 border-primary-pink text-primary-pink hover:bg-hover-pink hover:border-hover-pink hover:text-white text-[10px] md:text-base font-medium px-4 py-2 lg:px-6 lg:py-3 rounded-lg transition-all duration-300 shadow-sm"
                 >
                   Lihat Selengkapnya
                 </a>
@@ -203,7 +204,7 @@ export default function Home() {
             <h1 className="text-3xl lg:text-4xl font-bold text-black">
               Kursus <span className="text-primary-pink">Kami</span>
             </h1>
-            <p className="mt-6 text-black max-w-4xl mx-auto text-base leading-relaxed">
+            <p className="mt-6 text-black max-w-4xl mx-auto text-xs lg:text-base leading-relaxed">
               Kami menawarkan kurikulum komprehensif yang dikembangkan oleh tim
               internasional, guru-guru yang berpengalaman, dan fokus pada
               pembelajaran individual dan berbasis proyek. Di Koding Next,
@@ -225,8 +226,9 @@ export default function Home() {
                     <div className="aspect-video lg:aspect-square overflow-hidden">
                       <img
                         src={course.image_url}
-                        className="w-full h-full"
+                        className="w-full h-full object-cover" 
                         alt={course.name}
+                        loading="lazy"
                       />
                     </div>
 
@@ -299,6 +301,7 @@ export default function Home() {
                             src={promo.image_url}
                             alt={promo.title}
                             className="w-full h-full object-contain"
+                            loading="lazy"
                           />
                         </div>
                       </div>
@@ -480,6 +483,7 @@ export default function Home() {
               <button
                 onClick={() => scroll("left")}
                 className="text-black hover:text-primary-pink transition-alltransition-all"
+                aria-label="Slide sebelumnya"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -507,6 +511,7 @@ export default function Home() {
               <button
                 onClick={() => scroll("right")}
                 className="text-black hover:text-primary-pink transition-all"
+                aria-label="Slide berikutnya"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -532,7 +537,7 @@ export default function Home() {
         <div className="container mx-auto px-6 lg:px-16">
           <div className="flex justify-between items-end mb-6 lg:pl-20 lg:pr-32">
             <div>
-              <h2 className="px-8 text-4xl font-bold text-gray-900 leading-tight">
+              <h2 className="px-8 text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                 Kegiatan <span className="text-primary-pink">Kami</span>
               </h2>
             </div>
@@ -541,6 +546,7 @@ export default function Home() {
               <button
                 onClick={() => scrollEvent(-1)}
                 className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-colors"
+                aria-label="Slide sebelumnya"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -559,6 +565,7 @@ export default function Home() {
               <button
                 onClick={() => scrollEvent(1)}
                 className="w-10 h-10 rounded-full border-2 border-primary-pink text-primary-pink flex items-center justify-center hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-colors"
+                aria-label="Slide berikutnya"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -595,6 +602,7 @@ export default function Home() {
                     src={event.image_url}
                     className="w-full h-64 lg:h-72 object-cover transition-transform duration-500 group-hover:scale-105"
                     alt={event.name}
+                    loading="lazy"
                   />
                 </div>
 
@@ -633,7 +641,7 @@ export default function Home() {
                 type="button"
                 className="absolute inset-0 bg-black/50 backdrop-blur-[3px] cursor-default w-full h-full"
                 onClick={() => setSelectedEvent(null)}
-                aria-label="Tutup modal"
+                aria-label="Tutup kegiatan"
               />
 
               <dialog
@@ -668,6 +676,7 @@ export default function Home() {
                     src={selectedEvent.image_url}
                     alt={selectedEvent.name}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
 
@@ -709,16 +718,16 @@ export default function Home() {
           <div className="flex justify-center mt-6">
             <a
               href="/kegiatan"
-              className="border-2 border-primary-pink text-primary-pink px-6 py-3 rounded-lg font-medium hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-all duration-300 shadow-sm"
+              className="border-2 border-primary-pink text-primary-pink rounded-lg text-[10px] md:text-base font-medium px-4 py-2 lg:px-6 lg:py-3 hover:bg-hover-pink hover:border-hover-pink hover:text-white transition-all duration-300 shadow-sm"
             >
-              Lihat Selengkapnya
+              Lihat Kegiatan
             </a>
           </div>
         </div>
       </section>
 
-      <section className="py-24 bg-linear-to-b from-transparent via-30% via-primary-pink/30 to-primary-blue/40 text-center">
-        <h2 className="text-4xl font-bold mb-4 mt-4">
+      <section className="p-8 lg:p-18 py-24 bg-linear-to-b from-transparent via-30% via-primary-pink/30 to-primary-blue/40 text-center">
+        <h2 className="text-2xl lg:text-4xl font-bold mb-4 mt-4">
           Start Your Journey as a{" "}
           <span className="text-primary-pink">Future Coder!</span>
         </h2>
@@ -731,12 +740,12 @@ export default function Home() {
         <a
           href="https://wa.me/6281115525959"
           target="_blank"
-          className="mt-14 inline-block bg-primary-pink text-white px-6 py-3 rounded-lg font-medium hover:bg-hover-pink transition-colors"
+          className="mt-14 inline-block bg-primary-pink text-white rounded-lg text-[10px] md:text-base font-medium px-4 py-2 lg:px-6 lg:py-3 hover:bg-hover-pink transition-colors"
           rel="noreferrer"
         >
           Hubungi Kami
         </a>
       </section>
-    </div>
+    </main>
   );
 }
